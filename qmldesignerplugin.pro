@@ -3,7 +3,7 @@ QT += widgets-private quick-private quickwidgets-private core-private gui-privat
 CONFIG += exceptions
 
 INCLUDEPATH += $$PWD
-INCLUDEPATH += "/Users/mauriziovit/Qt/5.8/clang_64/lib"
+#Path to CLANG or GCC here
 INCLUDEPATH += ""
 unix:!openbsd:!osx: LIBS += -lrt # posix shared memory
 
