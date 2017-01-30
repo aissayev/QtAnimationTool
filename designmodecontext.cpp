@@ -28,6 +28,7 @@
 #include "designmodewidget.h"
 #include "formeditorwidget.h"
 #include "navigatorwidget.h"
+#include "timelinewidget.h"
 
 namespace QmlDesigner {
 namespace Internal {
@@ -66,6 +67,18 @@ NavigatorContext::NavigatorContext(QWidget *widget)
 QString NavigatorContext::contextHelpId() const
 {
     return qobject_cast<NavigatorWidget *>(m_widget)->contextHelpId();
+}
+
+TimelineContext::TimelineContext(QWidget *widget)
+  : IContext(widget)
+{
+    setWidget(widget);
+    setContext(Core::Context(Constants::C_QMLTIMELINE, Constants::C_QT_QUICK_TOOLS_MENU));
+}
+
+QString TimelineContext::contextHelpId() const
+{
+    return qobject_cast<TimelineWidget *>(m_widget)->contextHelpId();
 }
 
 }

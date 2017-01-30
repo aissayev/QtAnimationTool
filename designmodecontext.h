@@ -54,5 +54,12 @@ public:
     QString contextHelpId() const;
 };
 
+class TimelineContext : public Core::IContext
+{
+public:
+    TimelineContext(QWidget *widget);
+    QString contextHelpId() const;
+};
+
 }
 }

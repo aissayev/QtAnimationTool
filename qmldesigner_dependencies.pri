@@ -23,6 +23,7 @@ INCLUDEPATH *= \
     $$PWD/components/formeditor \
     $$PWD/components/itemlibrary \
     $$PWD/components/navigator \
+    $$PWD/components/timeline \
     $$PWD/components/propertyeditor \
     $$PWD/components/stateseditor \
     $$PWD/components/debugview \

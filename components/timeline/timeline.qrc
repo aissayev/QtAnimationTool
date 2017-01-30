@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/timeline/icon">
+        <file>play.png</file>
+        <file>play@2x.png</file>
+    </qresource>
+</RCC>

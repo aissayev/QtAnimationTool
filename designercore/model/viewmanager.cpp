@@ -31,6 +31,7 @@
 #include <nodeinstanceview.h>
 #include <itemlibraryview.h>
 #include <navigatorview.h>
+#include <timelineview.h>
 #include <stateseditorview.h>
 #include <formeditorview.h>
 #include <propertyeditorview.h>
@@ -57,6 +58,7 @@ public:
     FormEditorView formEditorView;
     ItemLibraryView itemLibraryView;
     NavigatorView navigatorView;
+    TimelineView timelineView;
     PropertyEditorView propertyEditorView;
     StatesEditorView statesEditorView;
     NodeInstanceView nodeInstanceView;
@@ -146,6 +148,7 @@ void ViewManager::detachViewsExceptRewriterAndComponetView()
     currentModel()->detachView(&d->designerActionManagerView);
     currentModel()->detachView(&d->formEditorView);
     currentModel()->detachView(&d->navigatorView);
+    currentModel()->detachView(&d->timelineView);
     currentModel()->detachView(&d->itemLibraryView);
     currentModel()->detachView(&d->statesEditorView);
     currentModel()->detachView(&d->propertyEditorView);
@@ -198,6 +201,7 @@ void ViewManager::attachViewsExceptRewriterAndComponetView()
     attachNodeInstanceView();
     currentModel()->attachView(&d->formEditorView);
     currentModel()->attachView(&d->navigatorView);
+    currentModel()->attachView(&d->timelineView);
     attachItemLibraryView();
     currentModel()->attachView(&d->statesEditorView);
     currentModel()->attachView(&d->propertyEditorView);
@@ -237,6 +241,7 @@ QList<WidgetInfo> ViewManager::widgetInfos()
 
     widgetInfoList.append(d->formEditorView.widgetInfo());
     widgetInfoList.append(d->itemLibraryView.widgetInfo());
+    widgetInfoList.append(d->timelineView.widgetInfo());
     widgetInfoList.append(d->navigatorView.widgetInfo());
     widgetInfoList.append(d->propertyEditorView.widgetInfo());
     widgetInfoList.append(d->statesEditorView.widgetInfo());

@@ -58,7 +58,7 @@ NavigatorWidget::NavigatorWidget(NavigatorView *view) :
 
     setLayout(layout);
 
-    setWindowTitle(tr("Fart Instigator", "Title of navigator view"));
+    setWindowTitle(tr("Navigator", "Title of navigator view"));
 
     setStyleSheet(Theming::replaceCssColors(QString::fromUtf8(Utils::FileReader::fetchQrc(QLatin1String(":/qmldesigner/stylesheet.css")))));
     m_treeView->setStyleSheet(Theming::replaceCssColors(QString::fromUtf8(Utils::FileReader::fetchQrc(QLatin1String(":/qmldesigner/scrollbar.css")))));

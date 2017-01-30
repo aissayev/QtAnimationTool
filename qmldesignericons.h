@@ -48,6 +48,7 @@ const Utils::Icon NO_SNAPPING({
         {QLatin1String(":/icon/layout/no_snapping.png"), Utils::Theme::IconsBaseColor}});
 const Utils::Icon NO_SNAPPING_AND_ANCHORING({
         {QLatin1String(":/icon/layout/snapping_and_anchoring.png"), Utils::Theme::IconsBaseColor}});
-
+const Utils::Icon PLAY({
+        {QLatin1String(":/timeline/icon/play.png"), Utils::Theme::IconsBaseColor}});
 } // Icons
 } // QmlDesigner

@@ -25,33 +25,37 @@
 
 #pragma once
 
+#include <QFrame>
+#include <QPointer>
+
+QT_FORWARD_DECLARE_CLASS(QToolButton)
+QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
+
 namespace QmlDesigner {
-namespace Constants {
 
-const char C_BACKSPACE[]            = "QmlDesigner.Backspace";
-const char C_DELETE[]               = "QmlDesigner.Delete";
+class TimelineView;
 
-// Context
-const char C_QMLDESIGNER[]         = "QmlDesigner::QmlDesignerMain";
-const char C_QMLFORMEDITOR[]       = "QmlDesigner::FormEditor";
-const char C_QMLNAVIGATOR[]        = "QmlDesigner::Navigator";
-const char C_QMLTIMELINE[]        = "QmlDesigner::Timeline";
+class TimelineWidget: public QFrame
+{
+    Q_OBJECT
+public:
+    TimelineWidget(TimelineView *view);
 
-// Special context for preview menu, shared b/w designer and text editor
-const char C_QT_QUICK_TOOLS_MENU[] = "QmlDesigner::ToolsMenu";
+    void setTreeModel(QAbstractItemModel *model);
+    QList<QToolButton *> createToolBarWidgets();
+    QString contextHelpId() const;
 
-// Actions
-const char SWITCH_TEXT_DESIGN[]   = "QmlDesigner.SwitchTextDesign";
-const char RESTORE_DEFAULT_VIEW[] = "QmlDesigner.RestoreDefaultView";
-const char TOGGLE_LEFT_SIDEBAR[] = "QmlDesigner.ToggleLeftSideBar";
-const char TOGGLE_RIGHT_SIDEBAR[] = "QmlDesigner.ToggleRightSideBar";
-const char GO_INTO_COMPONENT[] = "QmlDesigner.GoIntoComponent";
+signals:
+    void leftButtonClicked();
+    void rightButtonClicked();
+    void upButtonClicked();
+    void downButtonClicked();
 
-const char QML_DESIGNER_SUBFOLDER[] = "/designer/";
+private: // functions
+    TimelineView *timelineView() const;
 
-namespace Internal {
-    enum { debug = 0 };
+private: // variables
+    QPointer<TimelineView> m_timelineView;
+};
+
 }
-
-} // Constants
-} // QmlDesigner
