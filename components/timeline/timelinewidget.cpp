@@ -27,49 +27,41 @@
 #include "timelineview.h"
 #include "qmldesignerconstants.h"
 #include "qmldesignericons.h"
+
 #include <theming.h>
 
+#include <invalidqmlsourceexception.h>
+
+#include <coreplugin/icore.h>
+
+#include <utils/qtcassert.h>
+#include <utils/stylehelper.h>
+
+#include <QApplication>
+
+#include <QFileInfo>
+#include <QShortcut>
 #include <QBoxLayout>
-#include <QToolButton>
-#include <QAbstractItemModel>
-#include <QHeaderView>
-#include <QtDebug>
-#include <utils/fileutils.h>
+#include <QKeySequence>
+
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickItem>
 
 namespace QmlDesigner {
 
 TimelineWidget::TimelineWidget(TimelineView *view) :
-        QFrame(),
+        QQuickWidget(),
         m_timelineView(view)
 {
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->setMargin(0);
-
-    setLayout(layout);
+    setResizeMode(QQuickWidget::SizeRootObjectToView);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme()); 
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
-
-    setStyleSheet(Theming::replaceCssColors(QString::fromUtf8(Utils::FileReader::fetchQrc(QLatin1String(":/qmldesigner/stylesheet.css")))));
 }
 
-void TimelineWidget::setTreeModel(QAbstractItemModel* model)
-{
-}
-
-QList<QToolButton *> TimelineWidget::createToolBarWidgets()
-{
-    QList<QToolButton *> buttons;
-
-    buttons.append(new QToolButton());
-    buttons.last()->setIcon(Icons::PLAY.icon());
-    buttons.last()->setToolTip(tr("Play the sequence (CTRL + J)."));
-    buttons.last()->setShortcut(QKeySequence(Qt::Key_J | Qt::CTRL));
-    connect(buttons.last(), SIGNAL(clicked()), this, SIGNAL(leftButtonClicked()));
-
-    return buttons;
-}
 
 QString TimelineWidget::contextHelpId() const
 {

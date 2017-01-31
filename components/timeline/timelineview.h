@@ -46,53 +46,16 @@ class TimelineView : public AbstractView
 public:
     TimelineView(QObject* parent = 0);
     ~TimelineView();
-
-    bool hasWidget() const override;
+    //Abstract View
     WidgetInfo widgetInfo() override;
 
-    // AbstractView
-    void modelAttached(Model *model) override;
-    void modelAboutToBeDetached(Model *model) override;
-
-    void importsChanged(const QList<Import> &addedImports, const QList<Import> &removedImports) override;
-
-    void nodeAboutToBeRemoved(const ModelNode &removedNode) override;
-    void nodeOrderChanged(const NodeListProperty &listProperty, const ModelNode &movedNode, int oldIndex) override;
-
-    void nodeReparented(const ModelNode &node, const NodeAbstractProperty &newPropertyParent, const NodeAbstractProperty &oldPropertyParent, AbstractView::PropertyChangeFlags propertyChange) override;
-    void rootNodeTypeChanged(const QString &type, int majorVersion, int minorVersion) override;
-    void nodeIdChanged(const ModelNode& node, const QString& newId, const QString& oldId) override;
-    void propertiesAboutToBeRemoved(const QList<AbstractProperty>& propertyList) override;
-    void propertiesRemoved(const QList<AbstractProperty>& propertyList) override;
-
-    void selectedNodesChanged(const QList<ModelNode> &selectedNodeList ,
-                                      const QList<ModelNode> &lastSelectedNodeList) override;
-    void auxiliaryDataChanged(const ModelNode &node, const PropertyName &name, const QVariant &data) override;
-    void instanceErrorChange(const QVector<ModelNode> &errorNodeList) override;
-
-    void bindingPropertiesChanged(const QList<BindingProperty> &propertyList, PropertyChangeFlags) override;
 
 private slots:
-    void changeSelection(const QItemSelection &selected, const QItemSelection &deselected);
-    void updateItemSelection();
-    void changeToComponent(const QModelIndex &index);
-
-    void leftButtonClicked();
-    void rightButtonClicked();
-    void upButtonClicked();
-    void downButtonClicked();
 
 protected: //functions
-    QTreeView *treeWidget();
-    bool blockSelectionChangedSignal(bool block);
-    void expandRecursively(const QModelIndex &index);
 
 private:
-    bool m_blockSelectionChangedSignal;
-
-    QPointer<TimelineWidget> m_widget;
-
-    friend class TestTimeline;
+  QPointer<TimelineWidget> m_widget;
 };
 
 }

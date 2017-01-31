@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <QFrame>
+#include <QQuickWidget>
 #include <QPointer>
 
 QT_FORWARD_DECLARE_CLASS(QToolButton)
@@ -35,21 +35,14 @@ namespace QmlDesigner {
 
 class TimelineView;
 
-class TimelineWidget: public QFrame
+class TimelineWidget: public QQuickWidget
 {
     Q_OBJECT
 public:
     TimelineWidget(TimelineView *view);
-
-    void setTreeModel(QAbstractItemModel *model);
-    QList<QToolButton *> createToolBarWidgets();
     QString contextHelpId() const;
 
 signals:
-    void leftButtonClicked();
-    void rightButtonClicked();
-    void upButtonClicked();
-    void downButtonClicked();
 
 private: // functions
     TimelineView *timelineView() const;
