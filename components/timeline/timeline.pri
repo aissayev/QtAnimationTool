@@ -1,3 +1,5 @@
+QT *= qml quick core
+
 VPATH += $$PWD
 
 SOURCES += timelineview.cpp \

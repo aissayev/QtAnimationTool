@@ -537,7 +537,7 @@ QWidget *DesignModeWidget::createCenterWidget()
     QVBoxLayout *horizontalLayout = new QVBoxLayout(centerWidget);
     horizontalLayout->setMargin(0);
     horizontalLayout->setSpacing(0);
-
+    
     horizontalLayout->addWidget(m_toolBar);
     horizontalLayout->addWidget(createCrumbleBarFrame());
 

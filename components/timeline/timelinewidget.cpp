@@ -47,6 +47,7 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
+#include <QDebug>
 
 namespace QmlDesigner {
 
@@ -72,10 +73,11 @@ QString TimelineWidget::qmlSourcesPath() {
 
 void TimelineWidget::reloadQmlSource()
 {
-    QString statesListQmlFilePath = qmlSourcesPath() + QStringLiteral("/timeline.qml");
-    QTC_ASSERT(QFileInfo::exists(statesListQmlFilePath), return);
+    QString timelineQmlFilePath = qmlSourcesPath() + QStringLiteral("/timeline.qml");
+    qDebug() << timelineQmlFilePath;
+    QTC_ASSERT(QFileInfo::exists(timelineQmlFilePath), return);
     engine()->clearComponentCache();
-    setSource(QUrl::fromLocalFile(statesListQmlFilePath));
+    setSource(QUrl::fromLocalFile(timelineQmlFilePath));
 
     QTC_ASSERT(rootObject(), return);
     setFixedHeight(initialSize().height());
