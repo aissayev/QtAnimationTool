@@ -478,6 +478,21 @@ static QWidget *createTopSideBarWidget(const QList<WidgetInfo> &widgetInfos)
         return createWidgetsInTabWidget(topWidgetInfos);
 }
 
+static QWidget *createBottomSideBarWidget(const QList<WidgetInfo> &widgetInfos)
+{
+    //### we now own these here
+    QList<WidgetInfo> bottomWidgetInfos;
+    foreach (const WidgetInfo &widgetInfo, widgetInfos) {
+        if (widgetInfo.placementHint == widgetInfo.BottomPane)
+            bottomWidgetInfos.append(widgetInfo);
+    }
+
+    if (bottomWidgetInfos.count() == 1)
+        return bottomWidgetInfos.first().widget;
+    else
+        return createWidgetsInTabWidget(bottomWidgetInfos);
+}
+
 static Core::MiniSplitter *createCentralSplitter(const QList<WidgetInfo> &widgetInfos)
 {
     QList<WidgetInfo> centralWidgetInfos;
@@ -527,9 +542,13 @@ QWidget *DesignModeWidget::createCenterWidget()
     horizontalLayout->addWidget(createCrumbleBarFrame());
 
     m_topSideBar = createTopSideBarWidget(viewManager().widgetInfos());
+    m_bottomSideBar = createBottomSideBarWidget(viewManager().widgetInfos());
+
     horizontalLayout->addWidget(m_topSideBar.data());
 
     horizontalLayout->addWidget(createCentralSplitter(viewManager().widgetInfos()));
+
+    horizontalLayout->addWidget(m_bottomSideBar.data());
 
     return centerWidget;
 }

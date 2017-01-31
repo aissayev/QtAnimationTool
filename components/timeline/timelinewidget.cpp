@@ -54,14 +54,39 @@ TimelineWidget::TimelineWidget(TimelineView *view) :
         QQuickWidget(),
         m_timelineView(view)
 {
+    engine()->addImportPath(qmlSourcesPath());
 
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme()); 
+    Theming::registerIconProvider(engine());
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
+    reloadQmlSource();
 }
 
+QString TimelineWidget::qmlSourcesPath() {
+    return Core::ICore::resourcePath() + QStringLiteral("/qmldesigner/timelineQmlSources");
+}
+
+void TimelineWidget::reloadQmlSource()
+{
+    QString statesListQmlFilePath = qmlSourcesPath() + QStringLiteral("/timeline.qml");
+    QTC_ASSERT(QFileInfo::exists(statesListQmlFilePath), return);
+    engine()->clearComponentCache();
+    setSource(QUrl::fromLocalFile(statesListQmlFilePath));
+
+    QTC_ASSERT(rootObject(), return);
+    setFixedHeight(initialSize().height());
+
+    connect(rootObject(), SIGNAL(expandedChanged()), this, SLOT(changeHeight()));
+}
+
+void TimelineWidget::changeHeight()
+{
+    setFixedHeight(rootObject()->height());
+}
 
 QString TimelineWidget::contextHelpId() const
 {

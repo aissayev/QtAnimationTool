@@ -41,13 +41,17 @@ class TimelineWidget: public QQuickWidget
 public:
     TimelineWidget(TimelineView *view);
     QString contextHelpId() const;
+    
+    static QString qmlSourcesPath();
 
 signals:
 
+private slots:
+    void reloadQmlSource();
+    void changeHeight();
+
 private: // functions
     TimelineView *timelineView() const;
-
-private: // variables
     QPointer<TimelineView> m_timelineView;
 };
 

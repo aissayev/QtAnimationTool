@@ -25,28 +25,16 @@
 
 #include "timelineview.h"
 #include "timelinewidget.h"
-#include "qmldesignerconstants.h"
 #include "qmldesignericons.h"
 
-#include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/icore.h>
 
-#include <utils/icon.h>
-#include <utils/utilsicons.h>
-
-#include <bindingproperty.h>
 #include <designmodecontext.h>
-#include <nodeproperty.h>
-#include <nodelistproperty.h>
-#include <variantproperty.h>
-#include <QHeaderView>
-#include <qmlitemnode.h>
 
 namespace QmlDesigner {
 
 TimelineView::TimelineView(QObject* parent) :
-        AbstractView(parent),
-        m_widget(new TimelineWidget(this))
+        AbstractView(parent)
 {
     Internal::TimelineContext *timelineContext = new Internal::TimelineContext(m_widget.data());
     Core::ICore::addContextObject(timelineContext);
@@ -60,11 +48,15 @@ TimelineView::~TimelineView()
 
 WidgetInfo TimelineView::widgetInfo()
 {
+
+    if (!m_widget)
+        m_widget = new TimelineWidget(this);
     return createWidgetInfo(m_widget.data(),
                             0,
                             QStringLiteral("Timeline"),
-                            WidgetInfo::TopPane,
-                            0);
+                            WidgetInfo::BottomPane,
+                            0,
+                            tr("Timeline Editor"));
 }
 
 } // namespace QmlDesigner
