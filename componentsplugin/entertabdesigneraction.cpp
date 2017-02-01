@@ -33,6 +33,7 @@
 #include <qmlitemnode.h>
 
 #include <QCoreApplication>
+#include <QDebug>
 
 namespace QmlDesigner {
 
@@ -75,6 +76,7 @@ int EnterTabDesignerAction::priority() const
 void EnterTabDesignerAction::updateContext()
 {
     menu()->clear();
+    qDebug() << "hi";
     if (selectionContext().isValid()) {
 
         action()->setEnabled(isEnabled(selectionContext()));

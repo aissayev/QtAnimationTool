@@ -73,7 +73,6 @@ NavigatorView::NavigatorView(QObject* parent) :
     Core::ICore::addContextObject(navigatorContext);
 
     m_widget->setTreeModel(m_treeModel.data());
-
     connect(treeWidget()->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(changeSelection(QItemSelection,QItemSelection)));
 
     connect(m_widget.data(), SIGNAL(leftButtonClicked()), this, SLOT(leftButtonClicked()));

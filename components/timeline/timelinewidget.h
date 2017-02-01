@@ -27,6 +27,7 @@
 
 #include <QQuickWidget>
 #include <QPointer>
+#include <QShortcut>
 
 QT_FORWARD_DECLARE_CLASS(QToolButton)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
@@ -53,6 +54,7 @@ private slots:
 private: // functions
     TimelineView *timelineView() const;
     QPointer<TimelineView> m_timelineView;
+    QShortcut *m_qmlSourceUpdateShortcut;
 };
 
 }
