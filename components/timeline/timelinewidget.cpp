@@ -51,11 +51,11 @@
 
 namespace QmlDesigner {
 
-  TimelineWidget::TimelineWidget(TimelineView *view) :
-  QQuickWidget(),
-  m_timelineView(view),
-  m_qmlSourceUpdateShortcut(0)
-  {
+TimelineWidget::TimelineWidget(TimelineView *view) :
+    QQuickWidget(),
+    m_timelineView(view),
+    m_qmlSourceUpdateShortcut(0)
+{
     engine()->addImportPath(qmlSourcesPath());
 
     setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -69,21 +69,29 @@ namespace QmlDesigner {
     dataList.append("Item 2");
     dataList.append("Item 3");
     dataList.append("Item 4");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
+    dataList.append("Item 5");
 
-    rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList)); 
-    rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme()); 
+    rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList));
+    rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme());
     Theming::registerIconProvider(engine());
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
     reloadQmlSource();
-  }
+}
 
-  QString TimelineWidget::qmlSourcesPath() {
+QString TimelineWidget::qmlSourcesPath() {
     return Core::ICore::resourcePath() + QStringLiteral("/qmldesigner/timelineQmlSources");
-  }
+}
 
-  void TimelineWidget::reloadQmlSource()
-  {
+void TimelineWidget::reloadQmlSource()
+{
     QString timelineQmlFilePath = qmlSourcesPath() + QStringLiteral("/QtQuick/timeline.qml");
     qDebug() << timelineQmlFilePath;
     QTC_ASSERT(QFileInfo::exists(timelineQmlFilePath), return);
@@ -94,24 +102,24 @@ namespace QmlDesigner {
     setFixedHeight(initialSize().height());
 
     connect(rootObject(), SIGNAL(expandedChanged()), this, SLOT(changeHeight()));
-  }
+}
 
-  void TimelineWidget::changeHeight()
-  {
+void TimelineWidget::changeHeight()
+{
     setFixedHeight(rootObject()->height());
-  }
+}
 
-  QString TimelineWidget::contextHelpId() const
-  {
+QString TimelineWidget::contextHelpId() const
+{
     if (timelineView())
-      return  timelineView()->contextHelpId();
+        return  timelineView()->contextHelpId();
 
     return QString();
-  }
+}
 
-  TimelineView *TimelineWidget::timelineView() const
-  {
+TimelineView *TimelineWidget::timelineView() const
+{
     return m_timelineView.data();
-  }
+}
 
 }
