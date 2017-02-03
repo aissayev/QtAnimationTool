@@ -48,7 +48,10 @@ public:
     ~TimelineView();
     //Abstract View
     WidgetInfo widgetInfo() override;
+    void modelAttached(Model* model) override;
 
+signals:
+    void signalModelAttached(Model* model);
 
 private slots:
 

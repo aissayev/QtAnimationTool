@@ -48,6 +48,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QDebug>
+#include "metainfo.h"
 
 namespace QmlDesigner {
 
@@ -65,18 +66,8 @@ TimelineWidget::TimelineWidget(TimelineView *view) :
     connect(m_qmlSourceUpdateShortcut, SIGNAL(activated()), this, SLOT(reloadQmlSource()));
 
     QStringList dataList;
-    dataList.append("Item 1");
-    dataList.append("Item 2");
-    dataList.append("Item 3");
-    dataList.append("Item 4");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
-    dataList.append("Item 5");
+    //fillDataList(&dataList, view->model());
+    connect(view, SIGNAL(signalModelAttached(Model*)), this, SLOT(handleItemChanged(Model*)));
 
     rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList));
     rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme());
@@ -84,6 +75,36 @@ TimelineWidget::TimelineWidget(TimelineView *view) :
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
     reloadQmlSource();
+}
+
+
+void TimelineWidget::handleItemChanged(Model* model) {
+    // Doesn't do anything right now but might be good who knows
+    qDebug() << "Called";
+    QStringList dataList;
+    fillDataList(&dataList, model);
+    rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList));
+}
+
+void TimelineWidget::fillDataList(QStringList* dataList, Model *parent) {
+    if(parent) {
+        QString name = parent->objectName();
+        dataList->append(name);
+
+        //qDebug() << "Name [" << name << "]";
+        //qDebug() << "URL [" << parent->fileUrl() << "]";
+        //qDebug() << "";
+
+        int i;
+        for(i=0; i<parent->metaInfo().itemLibraryInfo()->entries().size(); i++) {
+            qDebug() << "Entry " << i << ": [" << parent->metaInfo().itemLibraryInfo()->entries()[i].name() << "]";
+        }
+
+        const QObjectList children = parent->children();
+        for(i=0; i<children.size(); i++){
+            fillDataList(dataList, (Model *)children[i]);
+        }
+    }
 }
 
 QString TimelineWidget::qmlSourcesPath() {

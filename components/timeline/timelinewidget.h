@@ -28,6 +28,9 @@
 #include <QQuickWidget>
 #include <QPointer>
 #include <QShortcut>
+#include <QStringList>
+#include <QStandardItem>
+#include "model.h"
 
 QT_FORWARD_DECLARE_CLASS(QToolButton)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
@@ -50,8 +53,10 @@ signals:
 private slots:
     void reloadQmlSource();
     void changeHeight();
+    void handleItemChanged(Model* model);
 
 private: // functions
+    void fillDataList(QStringList *data, Model *parent);
     TimelineView *timelineView() const;
     QPointer<TimelineView> m_timelineView;
     QShortcut *m_qmlSourceUpdateShortcut;
