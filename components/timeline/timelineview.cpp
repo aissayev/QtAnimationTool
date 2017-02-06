@@ -42,8 +42,17 @@ TimelineView::TimelineView(QObject* parent) :
 
 TimelineView::~TimelineView()
 {
-    if (m_widget && !m_widget->parent())
-        delete m_widget.data();
+    //if (m_widget && !m_widget->parent())
+    //    delete m_widget.data();
+}
+
+void TimelineView::modelAttached(Model *model)
+{
+    AbstractView::modelAttached(model);
+
+    emit signalModelAttached();
+
+    qDebug() << "Model URL: " << model->fileUrl();
 }
 
 WidgetInfo TimelineView::widgetInfo()

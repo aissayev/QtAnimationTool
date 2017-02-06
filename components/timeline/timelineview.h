@@ -29,12 +29,6 @@
 
 #include <QPointer>
 
-QT_BEGIN_NAMESPACE
-class QTreeView;
-class QItemSelection;
-class QModelIndex;
-QT_END_NAMESPACE
-
 namespace QmlDesigner {
 
 class TimelineWidget;
@@ -48,7 +42,10 @@ public:
     ~TimelineView();
     //Abstract View
     WidgetInfo widgetInfo() override;
+    void modelAttached(Model* model) override;
 
+signals:
+    void signalModelAttached();
 
 private slots:
 

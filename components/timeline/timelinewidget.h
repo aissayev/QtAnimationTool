@@ -28,9 +28,10 @@
 #include <QQuickWidget>
 #include <QPointer>
 #include <QShortcut>
-
-QT_FORWARD_DECLARE_CLASS(QToolButton)
-QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
+#include <QStringList>
+#include <QStandardItem>
+#include "model.h"
+#include "timelinenavigatorentity.h"
 
 namespace QmlDesigner {
 
@@ -39,6 +40,8 @@ class TimelineView;
 class TimelineWidget: public QQuickWidget
 {
     Q_OBJECT
+
+
 public:
     TimelineWidget(TimelineView *view);
     QString contextHelpId() const;
@@ -50,11 +53,15 @@ signals:
 private slots:
     void reloadQmlSource();
     void changeHeight();
+    void handleItemChanged();
 
 private: // functions
+    void fillDataList(QList<QObject*> *data, ModelNode parent, int depth);
     TimelineView *timelineView() const;
     QPointer<TimelineView> m_timelineView;
     QShortcut *m_qmlSourceUpdateShortcut;
+
 };
 
 }
+
