@@ -49,6 +49,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QDebug>
+#include "metainfo.h"
 
 
 namespace QmlDesigner {

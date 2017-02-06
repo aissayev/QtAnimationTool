@@ -33,6 +33,9 @@
 #include "model.h"
 #include "timelinenavigatorentity.h"
 
+QT_FORWARD_DECLARE_CLASS(QToolButton)
+QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
+
 namespace QmlDesigner {
 
 class TimelineView;

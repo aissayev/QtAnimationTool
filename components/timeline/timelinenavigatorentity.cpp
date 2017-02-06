@@ -57,7 +57,7 @@ QString getTypeIcon(const ModelNode &modelNode) {
         QList <ItemLibraryEntry> itemLibraryEntryList = libraryInfo->entriesForType(
             modelNode.type(), modelNode.majorVersion(), modelNode.minorVersion());
         if (!itemLibraryEntryList.isEmpty())
-            return QStringLiteral("../../common/") + *(itemLibraryEntryList.first().libraryEntryIconPath().replace(":/",""));
+            return QStringLiteral("../../common/") + itemLibraryEntryList.first().libraryEntryIconPath().replace(":/","");
         else if (modelNode.metaInfo().isValid())
             return QStringLiteral("../../common/ItemLibrary/images/item-default-icon.png");
     }
