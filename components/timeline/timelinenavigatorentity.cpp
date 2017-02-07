@@ -4,6 +4,7 @@
 #include "nodemetainfo.h"
 #include "metainfo.h"
 #include "model.h"
+#include <QDebug>
 
 namespace QmlDesigner {
 
@@ -56,13 +57,14 @@ QString getTypeIcon(const ModelNode &modelNode) {
         const ItemLibraryInfo *libraryInfo = modelNode.model()->metaInfo().itemLibraryInfo();
         QList <ItemLibraryEntry> itemLibraryEntryList = libraryInfo->entriesForType(
             modelNode.type(), modelNode.majorVersion(), modelNode.minorVersion());
-        if (!itemLibraryEntryList.isEmpty())
-            return QStringLiteral("../../common/") + itemLibraryEntryList.first().libraryEntryIconPath().replace(":/","");
+        if (!itemLibraryEntryList.isEmpty()) {
+            return QStringLiteral("image://qmldesigner_itemlibrary/") + itemLibraryEntryList.first().libraryEntryIconPath();
+        }
         else if (modelNode.metaInfo().isValid())
-            return QStringLiteral("../../common/ItemLibrary/images/item-default-icon.png");
+            return QStringLiteral("image://qmldesigner_itemlibrary/");
     }
 
-    return QStringLiteral("../../common/ItemLibrary/images/item-invalid-icon.png");
+    return QStringLiteral("image://qmldesigner_itemlibrary/");
 }
 
 }

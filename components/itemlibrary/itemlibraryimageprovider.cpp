@@ -24,8 +24,12 @@
 ****************************************************************************/
 
 #include "itemlibraryimageprovider.h"
-
+#include <QDebug>
 #include <utils/stylehelper.h>
+
+#include <utils/icon.h>
+#include <utils/utilsicons.h>
+#include <coreplugin/icore.h>
 
 namespace QmlDesigner {
 
@@ -39,6 +43,10 @@ ItemLibraryImageProvider::ItemLibraryImageProvider() :
 QPixmap ItemLibraryImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QPixmap pixmap(Utils::StyleHelper::dpiSpecificImageFile(id));
+
+    pixmap = Utils::Icon(id).pixmap();
+    qDebug() << "ID: [" + id + "]";
+
     if (size) {
         size->setWidth(pixmap.width());
         size->setHeight(pixmap.height());
