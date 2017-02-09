@@ -56,10 +56,8 @@ signals:
 private slots:
     void reloadQmlSource();
     void changeHeight();
-    void handleItemChanged();
 
 private: // functions
-    void fillDataList(QList<QObject*> *data, ModelNode parent, int depth);
     TimelineView *timelineView() const;
     QPointer<TimelineView> m_timelineView;
     QShortcut *m_qmlSourceUpdateShortcut;

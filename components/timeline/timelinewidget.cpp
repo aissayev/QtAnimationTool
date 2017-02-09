@@ -67,47 +67,11 @@ TimelineWidget::TimelineWidget(TimelineView *view) :
     m_qmlSourceUpdateShortcut = new QShortcut(QKeySequence(Qt::Key_J), this);
     connect(m_qmlSourceUpdateShortcut, SIGNAL(activated()), this, SLOT(reloadQmlSource()));
 
-    QStringList dataList;
-    connect(view, SIGNAL(signalModelAttached()), this, SLOT(handleItemChanged()));
-
-    rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList));
     rootContext()->setContextProperty(QLatin1String("creatorTheme"), Theming::theme());
     Theming::registerIconProvider(engine());
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
     reloadQmlSource();
-}
-
-void TimelineWidget::handleItemChanged() {
-    //Fill list with model names
-    QList<QObject*> dataList;
-    ModelNode root = m_timelineView->rootModelNode();
-    fillDataList(&dataList, root, 1);
-
-    qDebug() << "Root Icon Path: [" << ((TimelineNavigatorEntity*)dataList[0])->iconPath() << "]";
-    //Link datalist to QML
-    rootContext()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(dataList));
-}
-
-void TimelineWidget::fillDataList(QList<QObject*>*dataList, ModelNode parent, int depth) {
-    // Build TimelineNavigatorEntity for parent
-    QString name;
-    if(parent.hasId())
-        name = parent.id();
-    else
-        name = parent.simplifiedTypeName();
-    const ModelNode constParent = parent;
-    TimelineNavigatorEntity *data = new TimelineNavigatorEntity(name,getTypeIcon(constParent),depth);
-    dataList->append(data);
-
-    QList<ModelNode> children = parent.directSubModelNodes();
-    int i;
-    for(i=0; i<children.size(); i++){
-        ModelNode node = children[i];
-
-        if(node.metaInfo().isGraphicalItem())
-            fillDataList(dataList, children[i], depth+1);
-    }
 }
 
 QString TimelineWidget::qmlSourcesPath() {

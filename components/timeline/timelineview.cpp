@@ -25,6 +25,7 @@
 
 #include "timelineview.h"
 #include "timelinewidget.h"
+#include "timelineqmlbackend.h"
 #include "qmldesignericons.h"
 
 #include <coreplugin/icore.h>
@@ -33,39 +34,40 @@
 
 namespace QmlDesigner {
 
-TimelineView::TimelineView(QObject* parent) :
-        AbstractView(parent)
-{
-    Internal::TimelineContext *timelineContext = new Internal::TimelineContext(m_widget.data());
+  TimelineView::TimelineView(QObject* parent) :
+  AbstractView(parent),
+  m_backend(new TimelineQmlBackend(this))
+  {
+    Internal::TimelineContext *timelineContext = new Internal::TimelineContext(m_backend->widget());
     Core::ICore::addContextObject(timelineContext);
-}
+  }
 
-TimelineView::~TimelineView()
-{
-    //if (m_widget && !m_widget->parent())
-    //    delete m_widget.data();
-}
+  TimelineView::~TimelineView()
+  {
+//    if (m_widget && !m_widget->parent())
+//      delete m_widget;
+  }
 
-void TimelineView::modelAttached(Model *model)
-{
+//  void TimelineView::setupBackend(Model *model) {
+//    m_backend = new PropertyEditorBackend(this);
+//    m_backend->setModel(model);
+//  }
+
+  void TimelineView::modelAttached(Model *model)
+  {
     AbstractView::modelAttached(model);
-
+    m_backend->setupModel();
     emit signalModelAttached();
+  }
 
-    qDebug() << "Model URL: " << model->fileUrl();
-}
-
-WidgetInfo TimelineView::widgetInfo()
-{
-
-    if (!m_widget)
-        m_widget = new TimelineWidget(this);
-    return createWidgetInfo(m_widget.data(),
-                            0,
-                            QStringLiteral("Timeline"),
-                            WidgetInfo::BottomPane,
-                            0,
-                            tr("Timeline Editor"));
-}
+  WidgetInfo TimelineView::widgetInfo()
+  {
+    return createWidgetInfo(m_backend->widget(),
+    0,
+    QStringLiteral("Timeline"),
+    WidgetInfo::BottomPane,
+    0,
+    tr("Timeline Editor"));
+  }
 
 } // namespace QmlDesigner

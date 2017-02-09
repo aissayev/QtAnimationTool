@@ -32,6 +32,7 @@
 namespace QmlDesigner {
 
 class TimelineWidget;
+class TimelineQmlBackend;
 
 class TimelineView : public AbstractView
 {
@@ -52,7 +53,7 @@ private slots:
 protected: //functions
 
 private:
-  QPointer<TimelineWidget> m_widget;
+  TimelineQmlBackend *m_backend;
 };
 
 }
