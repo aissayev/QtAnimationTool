@@ -16,6 +16,7 @@ namespace QmlDesigner {
           m_widget(new TimelineWidget(timelineView)),
           m_timelineView(timelineView)
     {
+        //please give the model to model tree
     }
 
     void TimelineQmlBackend::setupModel() {
@@ -80,5 +81,4 @@ namespace QmlDesigner {
         }
         return QStringLiteral("image://qmldesigner_itemlibrary/");
     }
-
 }
