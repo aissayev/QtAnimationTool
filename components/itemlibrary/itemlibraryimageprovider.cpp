@@ -42,9 +42,9 @@ ItemLibraryImageProvider::ItemLibraryImageProvider() :
 
 QPixmap ItemLibraryImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    QPixmap pixmap(Utils::StyleHelper::dpiSpecificImageFile(id));
-
+    QPixmap pixmap;
     pixmap = Utils::Icon(id).pixmap();
+
     qDebug() << "ID: [" + id + "]";
 
     if (size) {
