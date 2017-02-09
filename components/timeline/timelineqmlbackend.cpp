@@ -1,5 +1,7 @@
-#include "model.h"
 #include "modelnode.h"
+#include "nodemetainfo.h"
+#include "metainfo.h"
+#include "model.h"
 
 #include "timelineqmlbackend.h"
 #include "timelineview.h"
