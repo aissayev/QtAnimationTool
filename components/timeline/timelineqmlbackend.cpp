@@ -34,8 +34,10 @@ namespace QmlDesigner {
                 name = parent.simplifiedTypeName();
             }
             const ModelNode constParent = parent;
-
-            m_model->addItem(TimelineItem(name, getNodeIconUrl(constParent), depth));
+            TimelineItem data = TimelineItem(name, getNodeIconUrl(constParent), depth);
+            Keyframe *key = new Keyframe("hi",depth,10,0,10,0);
+            data.addKeyframe(key);
+            m_model->addItem(data);
             QList<ModelNode> children = parent.directSubModelNodes();
             foreach(ModelNode node, children) {
                 if (node.metaInfo().isGraphicalItem())

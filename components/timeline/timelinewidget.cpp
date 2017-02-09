@@ -23,7 +23,6 @@
 **
 ****************************************************************************/
 #include "metainfo.h"
-#include "timelinenavigatorentity.h"
 #include "timelinewidget.h"
 #include "timelineview.h"
 #include "qmldesignerconstants.h"

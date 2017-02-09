@@ -31,7 +31,6 @@
 #include <QStringList>
 #include <QStandardItem>
 #include "model.h"
-#include "timelinenavigatorentity.h"
 
 QT_FORWARD_DECLARE_CLASS(QToolButton)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
