@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QQmlContext>
+#include "timelinemodel.h"
 
 namespace QmlDesigner {
 
@@ -34,5 +35,10 @@ namespace QmlDesigner {
     QPointer<TimelineWidget> m_widget;
     QPointer<TimelineView> m_timelineView;
     ModelNode m_rootModelNode;
+
+    void loadKeyframes(TimelineItem *data, ModelNode node);
+    int loadKeyframesHelper(TimelineItem *data, ModelNode node, QString name, int startTime);
+    Keyframe *buildKeyframe(ModelNode node, int startTime);
+    QVariant extractVariantProperty(AbstractProperty property) const;
   };
 }

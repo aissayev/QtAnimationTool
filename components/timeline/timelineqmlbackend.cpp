@@ -6,9 +6,10 @@
 #include "timelineqmlbackend.h"
 #include "timelineview.h"
 #include "timelinewidget.h"
-#include "timelinemodel.h"
 
 #include <QQmlContext>
+#include "variantproperty.h"
+#include "bindingproperty.h"
 
 namespace QmlDesigner {
     TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
@@ -36,15 +37,71 @@ namespace QmlDesigner {
             }
             const ModelNode constParent = parent;
             TimelineItem data = TimelineItem(name, getNodeIconUrl(constParent), depth);
-            Keyframe *key = new Keyframe("hi",depth,10,0,10,0);
-            data.addKeyframe(key);
+            loadKeyframes(&data, parent);
             m_model->addItem(data);
+
             QList<ModelNode> children = parent.directSubModelNodes();
             foreach(ModelNode node, children) {
                 if (node.metaInfo().isGraphicalItem())
                     makeModelFromNode(node, depth + 1);
             }
         }
+    }
+
+    void TimelineQmlBackend::loadKeyframes(TimelineItem *data, ModelNode node) {
+        foreach(ModelNode child, node.directSubModelNodes()) {
+            QString name = child.hasId() ? child.id() : child.simplifiedTypeName();
+            if (name.contains("Animation"))
+                loadKeyframesHelper(data, child, name, 0);
+        }
+    }
+
+    int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode node, QString name, int startTime) {
+        if(name.contains("ParallelAnimation")) {
+            int longestDuration = 0;
+            foreach(ModelNode child, node.directSubModelNodes()) {
+                QString childName = child.hasId() ? child.id() : child.simplifiedTypeName();
+                if (childName.contains("Animation")){
+                    int duration = loadKeyframesHelper(data, child, childName, startTime);
+                    if(duration > longestDuration)
+                        longestDuration = duration;
+                }
+            }
+            return longestDuration;
+        }
+        else if(name.contains("SequentialAnimation")) {
+            int currentTime = startTime;
+            foreach(ModelNode child, node.directSubModelNodes()) {
+                QString childName = child.hasId() ? child.id() : child.simplifiedTypeName();
+                if (childName.contains("Animation"))
+                    currentTime += loadKeyframesHelper(data, child, childName, currentTime);
+                qDebug() << "Current Time [" << currentTime << "]";
+            }
+            return currentTime - startTime;
+        }
+        else if(name.contains("PauseAnimation")) {
+            int duration = extractVariantProperty(node.property("duration")).toInt();
+            return duration;
+        }
+        else if(name.contains("Animation")){
+            Keyframe *frame = buildKeyframe(node,startTime);
+            data->addKeyframe(frame);
+            return frame->duration();
+        }
+        return 0;
+    }
+
+    Keyframe *TimelineQmlBackend::buildKeyframe(ModelNode node, int startTime) {
+        QString property = node.property("property").toBindingProperty().expression();
+        int duration = extractVariantProperty(node.property("duration")).toInt();
+        QVariant endValue = extractVariantProperty(node.property("to"));
+
+        return new Keyframe(property,startTime,duration,endValue,0);
+    }
+
+    QVariant TimelineQmlBackend::extractVariantProperty(AbstractProperty property) const{
+        Q_ASSERT(property.isVariantProperty());
+        return property.toVariantProperty().value();
     }
 
     TimelineModel *TimelineQmlBackend::model() {

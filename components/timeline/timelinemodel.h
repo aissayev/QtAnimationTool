@@ -14,7 +14,7 @@ namespace QmlDesigner {
 
   public:
     explicit Keyframe(QObject *parent=0);
-    Keyframe(const QString &property, const int &startTime, const int &duration, const int &startValue, const int &endValue,QObject *parent=0);
+    Keyframe(const QString &property, const int &startTime, const int &duration, const QVariant &endValue, QObject *parent=0);
 
     int startTime() const ;
     int duration() const ;
@@ -23,8 +23,7 @@ namespace QmlDesigner {
     QString m_property;
     int m_startTime;
     int m_duration;
-    int m_startValue;
-    int m_endValue;
+    QVariant m_endValue;
   };
 
   class TimelineItem

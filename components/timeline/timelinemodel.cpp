@@ -8,12 +8,11 @@ namespace QmlDesigner {
 
   }
 
-  Keyframe::Keyframe(const QString &property, const int &startTime, const int &duration, const int &startValue, const int &endValue, QObject *parent)
+  Keyframe::Keyframe(const QString &property, const int &startTime, const int &duration, const QVariant &endValue, QObject *parent)
     : QObject(parent),
       m_property(property),
       m_startTime(startTime), 
-      m_duration(duration), 
-      m_startValue(startValue), 
+      m_duration(duration),
       m_endValue(endValue)
   {  
   }
