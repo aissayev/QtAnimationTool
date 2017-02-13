@@ -9,8 +9,8 @@ namespace QmlDesigner {
   class PropertyKeyframePair: public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(int startTime READ startTime)
-    Q_PROPERTY(int duration READ duration)
+    Q_PROPERTY(int startTime READ startTime NOTIFY startTimeChanged)
+    Q_PROPERTY(int duration READ duration NOTIFY durationChanged)
 
   public:
     explicit PropertyKeyframePair(QObject *parent=0);
@@ -27,6 +27,10 @@ namespace QmlDesigner {
     int m_duration;
     QVariant m_startValue;
     QVariant m_endValue;
+
+  signals:
+    void startTimeChanged();
+    void durationChanged();
   };
 
   class TimelineItem
