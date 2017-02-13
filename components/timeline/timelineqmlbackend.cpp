@@ -85,7 +85,7 @@ namespace QmlDesigner {
             return duration;
         }
         else if(name.contains("Animation")){
-            PropertyKeyframePair *keyframe = buildKeyframe(node,startTime);
+            PropertyKeyframePair *keyframe = buildKeyframe(data,node,startTime);
             data->addKeyframe(keyframe);
             return keyframe->duration();
         }
@@ -93,17 +93,41 @@ namespace QmlDesigner {
     }
 
     // Temporarily Broken
-    PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(ModelNode node, int startTime) {
+    PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode node, int startTime) {
         QString property = node.property("property").toBindingProperty().expression();
         int duration = extractVariantProperty(node.property("duration")).toInt();
         QVariant endValue = extractVariantProperty(node.property("to"));
+        QVariant startValue;
+        if(node.hasProperty("from"))
+            startValue = extractVariantProperty(node.property("from"));
+        else if(data->propertyMap().contains(property))
+            startValue = extractValueAtTime(data->propertyMap()[property],startTime);
+        else
+            startValue = node.property(property.toLatin1()).toVariantProperty().value();
 
-        return new PropertyKeyframePair(property,startTime,duration,0,endValue,0);
+        return new PropertyKeyframePair(property,startTime,duration,startValue,endValue,0);
     }
 
     QVariant TimelineQmlBackend::extractVariantProperty(AbstractProperty property) const{
         Q_ASSERT(property.isVariantProperty());
         return property.toVariantProperty().value();
+    }
+
+    QVariant TimelineQmlBackend::extractValueAtTime(QList<QObject*> keyframes, int startTime) const {
+        int latestTime = 0;
+        QVariant value = 0;
+        foreach(QObject *object, keyframes) {
+            PropertyKeyframePair *keyframe = (PropertyKeyframePair*)object;
+            int frameStartTime = keyframe->startTime();
+            int duration = keyframe->duration();
+            if(frameStartTime + duration == startTime)
+                return keyframe->endValue();
+            else if(frameStartTime + duration > latestTime && frameStartTime < startTime) {
+                latestTime = frameStartTime + duration;
+                value = keyframe->endValue();
+            }
+        }
+        return value;
     }
 
     TimelineModel *TimelineQmlBackend::model() {

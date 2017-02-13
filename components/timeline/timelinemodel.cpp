@@ -18,6 +18,10 @@ namespace QmlDesigner {
   {  
   }
 
+  QString PropertyKeyframePair::propertyName() const {
+      return m_property;
+  }
+
   int PropertyKeyframePair::startTime() const {
     return m_startTime;
   }
@@ -26,11 +30,15 @@ namespace QmlDesigner {
     return m_duration;
   }
 
+  QVariant PropertyKeyframePair::endValue() const {
+      return m_endValue;
+  }
+
   TimelineItem::TimelineItem(const QString &name, const QString &iconPath, const int &depth)
     : m_name(name),
       m_iconPath(iconPath),
       m_depth(depth),
-      m_properties(QList<QString>()),
+      m_propertyMap(QMap<QString,QList<QObject*>>()),
       m_keyframes(QList<QObject*>())
   {
   }
@@ -52,15 +60,20 @@ namespace QmlDesigner {
   }
 
   QList<QString> TimelineItem::properties() const {
-    return m_properties;
+    return m_propertyMap.keys();
+  }
+
+  QMap<QString,QList<QObject*>> TimelineItem::propertyMap() const {
+    return m_propertyMap;
   }
 
   void TimelineItem::addKeyframe(PropertyKeyframePair *keyframe) {
     m_keyframes.append(keyframe);
-  }
 
-  void TimelineItem::addProperty(QString property) {
-    m_properties.append(property);
+    QString property = keyframe->propertyName();
+    if (!m_propertyMap.contains(property))
+        m_propertyMap.insert(property,QList<QObject*>());
+    m_propertyMap[property].append(keyframe);
   }
 
   TimelineModel::TimelineModel(QObject *parent)

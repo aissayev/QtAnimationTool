@@ -16,8 +16,10 @@ namespace QmlDesigner {
     explicit PropertyKeyframePair(QObject *parent=0);
     PropertyKeyframePair(const QString &property, const int &startTime, const int &duration, const QVariant &startValue, const QVariant &endValue, QObject *parent=0);
 
+    QString propertyName() const;
     int startTime() const ;
     int duration() const ;
+    QVariant endValue() const ;
 
   private:
     QString m_property;
@@ -36,19 +38,18 @@ namespace QmlDesigner {
     QString iconPath() const;
     int depth() const;
 
+    QMap<QString,QList<QObject*>> propertyMap() const;
     QList<QString> properties() const ;
     QList<QObject*> keyframes() const ;
 
-    void addProperty(QString property);
     void addKeyframe(PropertyKeyframePair *keyframe);
 
   private:
     QString m_name;
     QString m_iconPath;
     int m_depth;
-    QList<QString> m_properties;
+    QMap<QString,QList<QObject*>> m_propertyMap;
     QList<QObject*> m_keyframes;
-
   };
 
   class TimelineModel : public QAbstractListModel
