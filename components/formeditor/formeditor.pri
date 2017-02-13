@@ -36,7 +36,8 @@ SOURCES += formeditoritem.cpp \
     bindingindicator.cpp \
     bindingindicatorgraphicsitem.cpp \
     contentnoteditableindicator.cpp \
-    backgroundaction.cpp
+    backgroundaction.cpp \
+    motionindicator.cpp
 HEADERS += formeditorscene.h \
     formeditorwidget.h \
     formeditoritem.h \
@@ -74,5 +75,6 @@ HEADERS += formeditorscene.h \
     bindingindicator.h \
     bindingindicatorgraphicsitem.h \
     contentnoteditableindicator.h \
-    backgroundaction.h
+    backgroundaction.h \
+    motionindicator.h
 RESOURCES += formeditor.qrc
