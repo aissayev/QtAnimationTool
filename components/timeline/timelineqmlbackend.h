@@ -38,7 +38,7 @@ namespace QmlDesigner {
 
     void loadKeyframes(TimelineItem *data, ModelNode node);
     int loadKeyframesHelper(TimelineItem *data, ModelNode node, QString name, int startTime);
-    Keyframe *buildKeyframe(ModelNode node, int startTime);
+    PropertyKeyframePair *buildKeyframe(ModelNode node, int startTime);
     QVariant extractVariantProperty(AbstractProperty property) const;
   };
 }

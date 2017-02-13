@@ -6,15 +6,15 @@
 #include "modelnode.h"
 
 namespace QmlDesigner {
-  class Keyframe: public QObject {
+  class PropertyKeyframePair: public QObject {
     Q_OBJECT
 
     Q_PROPERTY(int startTime READ startTime)
     Q_PROPERTY(int duration READ duration)
 
   public:
-    explicit Keyframe(QObject *parent=0);
-    Keyframe(const QString &property, const int &startTime, const int &duration, const QVariant &endValue, QObject *parent=0);
+    explicit PropertyKeyframePair(QObject *parent=0);
+    PropertyKeyframePair(const QString &property, const int &startTime, const int &duration, const QVariant &startValue, const QVariant &endValue, QObject *parent=0);
 
     int startTime() const ;
     int duration() const ;
@@ -23,6 +23,7 @@ namespace QmlDesigner {
     QString m_property;
     int m_startTime;
     int m_duration;
+    QVariant m_startValue;
     QVariant m_endValue;
   };
 
@@ -39,7 +40,7 @@ namespace QmlDesigner {
     QList<QObject*> keyframes() const ;
 
     void addProperty(QString property);
-    void addKeyframe(Keyframe *keyframe);
+    void addKeyframe(PropertyKeyframePair *keyframe);
 
   private:
     QString m_name;

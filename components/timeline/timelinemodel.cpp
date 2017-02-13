@@ -4,24 +4,25 @@
 
 namespace QmlDesigner {
 
-  Keyframe::Keyframe(QObject *parent) : QObject(parent) {
+  PropertyKeyframePair::PropertyKeyframePair(QObject *parent) : QObject(parent) {
 
   }
 
-  Keyframe::Keyframe(const QString &property, const int &startTime, const int &duration, const QVariant &endValue, QObject *parent)
+  PropertyKeyframePair::PropertyKeyframePair(const QString &property, const int &startTime, const int &duration, const QVariant &startValue, const QVariant &endValue, QObject *parent)
     : QObject(parent),
       m_property(property),
       m_startTime(startTime), 
       m_duration(duration),
+      m_startValue(startValue),
       m_endValue(endValue)
   {  
   }
 
-  int Keyframe::startTime() const {
+  int PropertyKeyframePair::startTime() const {
     return m_startTime;
   }
 
-  int Keyframe::duration() const {
+  int PropertyKeyframePair::duration() const {
     return m_duration;
   }
 
@@ -54,7 +55,7 @@ namespace QmlDesigner {
     return m_properties;
   }
 
-  void TimelineItem::addKeyframe(Keyframe *keyframe) {
+  void TimelineItem::addKeyframe(PropertyKeyframePair *keyframe) {
     m_keyframes.append(keyframe);
   }
 
@@ -101,7 +102,7 @@ namespace QmlDesigner {
     roles[IconPathRole] = "iconPath";
     roles[DepthRole] = "deep";
     roles[PropertyRole] = "properties";
-    roles[KeyframeRole] = "keyframes";
+    roles[KeyframeRole] = "keyframe";
     return roles;
   }
 }

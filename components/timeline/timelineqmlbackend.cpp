@@ -56,6 +56,7 @@ namespace QmlDesigner {
         }
     }
 
+    //Temporarily Broken
     int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode node, QString name, int startTime) {
         if(name.contains("ParallelAnimation")) {
             int longestDuration = 0;
@@ -84,19 +85,20 @@ namespace QmlDesigner {
             return duration;
         }
         else if(name.contains("Animation")){
-            Keyframe *frame = buildKeyframe(node,startTime);
-            data->addKeyframe(frame);
-            return frame->duration();
+            PropertyKeyframePair *keyframe = buildKeyframe(node,startTime);
+            data->addKeyframe(keyframe);
+            return keyframe->duration();
         }
         return 0;
     }
 
-    Keyframe *TimelineQmlBackend::buildKeyframe(ModelNode node, int startTime) {
+    // Temporarily Broken
+    PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(ModelNode node, int startTime) {
         QString property = node.property("property").toBindingProperty().expression();
         int duration = extractVariantProperty(node.property("duration")).toInt();
         QVariant endValue = extractVariantProperty(node.property("to"));
 
-        return new Keyframe(property,startTime,duration,endValue,0);
+        return new PropertyKeyframePair(property,startTime,duration,0,endValue,0);
     }
 
     QVariant TimelineQmlBackend::extractVariantProperty(AbstractProperty property) const{
