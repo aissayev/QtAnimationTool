@@ -102,7 +102,7 @@ namespace QmlDesigner {
     roles[IconPathRole] = "iconPath";
     roles[DepthRole] = "deep";
     roles[PropertyRole] = "properties";
-    roles[KeyframeRole] = "keyframe";
+    roles[KeyframeRole] = "keyframes";
     return roles;
   }
 }
