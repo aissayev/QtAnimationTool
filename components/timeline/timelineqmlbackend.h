@@ -23,7 +23,6 @@ namespace QmlDesigner {
     QQmlContext *context();
 
     void setupModel();
-    void makeModelFromNode(ModelNode parent, int depth);
     void emitSelectionChanged();
     void emitValueChanged();
 
@@ -41,6 +40,8 @@ namespace QmlDesigner {
     PropertyKeyframePair *buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime);
     QVariant extractVariantProperty(AbstractProperty property) const;
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
-    void structureTimelineItemTree(TimelineItem *parent, int depth);
+
+    TimelineItem buildItemTree(ModelNode parent, int depth);
+    void populateTimelineModel(TimelineItem item);
   };
 }

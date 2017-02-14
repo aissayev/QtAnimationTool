@@ -40,7 +40,7 @@ namespace QmlDesigner {
       m_depth(depth),
       m_propertyMap(QMap<QString,QList<QObject*>>()),
       m_keyframes(QList<QObject*>()),
-      m_children(QList<TimelineItem*>())
+      m_children(QList<TimelineItem>())
   {
   }
 
@@ -64,8 +64,8 @@ namespace QmlDesigner {
     return m_propertyMap.keys();
   }
 
-  QList<TimelineItem*> TimelineItem::children() {
-    return m_children;
+  QList<TimelineItem> *TimelineItem::children() {
+    return &m_children;
   }
 
   QMap<QString,QList<QObject*>> TimelineItem::propertyMap() const {
@@ -82,7 +82,7 @@ namespace QmlDesigner {
   }
 
   void TimelineItem::addChild(TimelineItem child) {
-      m_children.append(&child);
+      m_children.append(child);
   }
 
   TimelineModel::TimelineModel(QObject *parent)

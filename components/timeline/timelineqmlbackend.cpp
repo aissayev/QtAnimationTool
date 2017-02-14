@@ -23,33 +23,39 @@ namespace QmlDesigner {
     void TimelineQmlBackend::setupModel() {
         m_rootModelNode = m_timelineView->rootModelNode();
         qDebug() << "Keyframe debug: [ property  :  start time  :  start value ]";
-        makeModelFromNode(m_rootModelNode, 1);
+        TimelineItem rootItem = buildItemTree(m_rootModelNode, 1);
+        qDebug() << "Populating timeline model.";
+        populateTimelineModel(rootItem);
+        qDebug() << "Finished populating timeline model.";
         context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
     }
 
-    void TimelineQmlBackend::structureTimelineItemTree(TimelineItem *parent, int depth) {
-        //Gonna put some really wonky code in here
+    TimelineItem TimelineQmlBackend::buildItemTree(ModelNode parent, int depth) {
+        if (parent.isValid()) {
+            QString name = parent.hasId() ? parent.id() : parent.simplifiedTypeName();
+
+            const ModelNode constParent = parent;
+            TimelineItem item = TimelineItem(name, getNodeIconUrl(constParent), depth);
+            loadKeyframes(&item, parent);
+
+            foreach(ModelNode child, parent.directSubModelNodes()) {
+                if(child.metaInfo().isGraphicalItem()) {
+                    TimelineItem childItem = buildItemTree(child, depth + 1);
+                    if(childItem.name() != "invalid_timelineitem")
+                        item.addChild(childItem);
+                }
+            }
+            return item;
+        }
+        return TimelineItem("invalid_timelineitem","",-1);
     }
 
-    void TimelineQmlBackend::makeModelFromNode(ModelNode parent, int depth) {
-        if (parent.isValid()) {
-            QString name;
-            if (parent.hasId()) {
-                name = parent.id();
-            }
-            else {
-                name = parent.simplifiedTypeName();
-            }
-            const ModelNode constParent = parent;
-            TimelineItem data = TimelineItem(name, getNodeIconUrl(constParent), depth);
-            loadKeyframes(&data, parent);
-            m_model->addItem(data);
+    void TimelineQmlBackend::populateTimelineModel(TimelineItem item) {
+        m_model->addItem(item);
 
-            QList<ModelNode> children = parent.directSubModelNodes();
-            foreach(ModelNode node, children) {
-                if (node.metaInfo().isGraphicalItem())
-                    makeModelFromNode(node, depth + 1);
-            }
+        QList<TimelineItem> *children = item.children();
+        foreach(TimelineItem child, *children) {
+            populateTimelineModel(child);
         }
     }
 
@@ -96,7 +102,6 @@ namespace QmlDesigner {
         return 0;
     }
 
-    // Temporarily Broken
     PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
         QString property = node.property("property").toBindingProperty().expression();
         int duration = extractVariantProperty(node.property("duration")).toInt();
