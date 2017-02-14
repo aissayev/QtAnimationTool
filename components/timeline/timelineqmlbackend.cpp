@@ -27,6 +27,10 @@ namespace QmlDesigner {
         context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
     }
 
+    void TimelineQmlBackend::structureTimelineItemTree(TimelineItem *parent, int depth) {
+        //Gonna put some really wonky code in here
+    }
+
     void TimelineQmlBackend::makeModelFromNode(ModelNode parent, int depth) {
         if (parent.isValid()) {
             QString name;

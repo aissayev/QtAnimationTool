@@ -45,8 +45,10 @@ namespace QmlDesigner {
     QMap<QString,QList<QObject*>> propertyMap() const;
     QList<QString> properties() const ;
     QList<QObject*> keyframes() const ;
+    QList<TimelineItem*> children();
 
     void addKeyframe(PropertyKeyframePair *keyframe);
+    void addChild(TimelineItem child);
 
   private:
     QString m_name;
@@ -54,6 +56,7 @@ namespace QmlDesigner {
     int m_depth;
     QMap<QString,QList<QObject*>> m_propertyMap;
     QList<QObject*> m_keyframes;
+    QList<TimelineItem*> m_children;
   };
 
   class TimelineModel : public QAbstractListModel

@@ -39,7 +39,8 @@ namespace QmlDesigner {
       m_iconPath(iconPath),
       m_depth(depth),
       m_propertyMap(QMap<QString,QList<QObject*>>()),
-      m_keyframes(QList<QObject*>())
+      m_keyframes(QList<QObject*>()),
+      m_children(QList<TimelineItem*>())
   {
   }
 
@@ -63,6 +64,10 @@ namespace QmlDesigner {
     return m_propertyMap.keys();
   }
 
+  QList<TimelineItem*> TimelineItem::children() {
+    return m_children;
+  }
+
   QMap<QString,QList<QObject*>> TimelineItem::propertyMap() const {
     return m_propertyMap;
   }
@@ -74,6 +79,10 @@ namespace QmlDesigner {
     if (!m_propertyMap.contains(property))
         m_propertyMap.insert(property,QList<QObject*>());
     m_propertyMap[property].append(keyframe);
+  }
+
+  void TimelineItem::addChild(TimelineItem child) {
+      m_children.append(&child);
   }
 
   TimelineModel::TimelineModel(QObject *parent)

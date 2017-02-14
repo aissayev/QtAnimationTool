@@ -41,5 +41,6 @@ namespace QmlDesigner {
     PropertyKeyframePair *buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime);
     QVariant extractVariantProperty(AbstractProperty property) const;
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
+    void structureTimelineItemTree(TimelineItem *parent, int depth);
   };
 }
