@@ -130,6 +130,10 @@ int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parent
         int duration = extractVariantProperty(node.property("duration")).toInt();
         return duration;
     }
+    else if (node.metaInfo().isSubclassOf("QtQuick.PathAnimation")) {
+        qDebug() << "PathAnimation is currently unsupported";
+        return 0;
+    }
     else if(node.metaInfo().isSubclassOf("QtQuick.Animation")){
         PropertyKeyframePair *keyframe = buildKeyframe(data,parentNode,node,startTime);
         data->addKeyframe(keyframe);
