@@ -44,9 +44,17 @@ public:
     //Abstract View
     WidgetInfo widgetInfo() override;
     void modelAttached(Model* model) override;
+    void modelAboutToBeDetached(Model* model) override;
+    void nodeCreated(const ModelNode &createdNode) override;
+    void nodeRemoved(const ModelNode &removedNode, const NodeAbstractProperty &parentProperty, PropertyChangeFlags propertyChange) override;
+    void nodeReparented(const ModelNode &node, const NodeAbstractProperty &newPropertyParent, const NodeAbstractProperty &oldPropertyParent, PropertyChangeFlags propertyChange) override;
 
 signals:
     void signalModelAttached();
+    void signalModelAboutToBeDetached();
+    void signalNodeCreated();
+    void signalNodeRemoved();
+    void signalNodeReparented();
 
 private slots:
 

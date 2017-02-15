@@ -46,18 +46,45 @@ namespace QmlDesigner {
   {
 //    if (m_widget && !m_widget->parent())
 //      delete m_widget;
-  }
+//  }
 
 //  void TimelineView::setupBackend(Model *model) {
 //    m_backend = new PropertyEditorBackend(this);
 //    m_backend->setModel(model);
-//  }
+  }
 
   void TimelineView::modelAttached(Model *model)
   {
     AbstractView::modelAttached(model);
     m_backend->setupModel();
     emit signalModelAttached();
+  }
+
+  void TimelineView::modelAboutToBeDetached(Model *model) {
+    AbstractView::modelAboutToBeDetached(model);
+    m_backend->destroyModel();
+    emit signalModelAboutToBeDetached();
+  }
+
+  void TimelineView::nodeCreated(const ModelNode &createdNode) {
+      AbstractView::nodeCreated(createdNode);
+      m_backend->destroyModel();
+      m_backend->setupModel();
+      emit signalNodeCreated();
+  }
+
+  void TimelineView::nodeRemoved(const ModelNode &removedNode, const NodeAbstractProperty &parentProperty, PropertyChangeFlags propertyChange) {
+      AbstractView::nodeRemoved(removedNode, parentProperty, propertyChange);
+      m_backend->destroyModel();
+      m_backend->setupModel();
+      emit signalNodeRemoved();
+  }
+
+  void TimelineView::nodeReparented(const ModelNode &node, const NodeAbstractProperty &newPropertyParent, const NodeAbstractProperty &oldPropertyParent, AbstractView::PropertyChangeFlags propertyChange) {
+      AbstractView::nodeReparented(node, newPropertyParent, oldPropertyParent, propertyChange);
+      m_backend->destroyModel();
+      m_backend->setupModel();
+      emit signalNodeReparented();
   }
 
   WidgetInfo TimelineView::widgetInfo()

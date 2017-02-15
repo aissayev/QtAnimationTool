@@ -10,8 +10,28 @@
 #include <QQmlContext>
 #include "variantproperty.h"
 #include "bindingproperty.h"
-
+#include "nodeabstractproperty.h"
 namespace QmlDesigner {
+
+//LOL
+QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode)
+{
+    QList<ModelNode> children;
+    PropertyNameList properties;
+
+    if (parentNode.metaInfo().hasDefaultProperty())
+        properties.append(parentNode.metaInfo().defaultPropertyName());
+
+    foreach (const PropertyName &propertyName, properties) {
+        AbstractProperty property(parentNode.property(propertyName));
+        if (property.isNodeAbstractProperty())
+            children.append(property.toNodeAbstractProperty().directSubNodes());
+    }
+
+    return children;
+}
+//RO MY C++ FL
+
     TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
         : m_model(new TimelineModel(this)),
           m_widget(new TimelineWidget(timelineView)),
@@ -30,6 +50,12 @@ namespace QmlDesigner {
         context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
     }
 
+    void TimelineQmlBackend::destroyModel() {
+        qDebug() << "Called";
+        delete(m_model);
+        m_model = new TimelineModel(this);
+    }
+
     TimelineItem TimelineQmlBackend::buildItemTree(ModelNode parent, int depth) {
         if (parent.isValid()) {
             QString name = parent.hasId() ? parent.id() : parent.simplifiedTypeName();
@@ -39,7 +65,7 @@ namespace QmlDesigner {
             loadKeyframes(&item, parent);
 
             foreach(ModelNode child, parent.directSubModelNodes()) {
-                if(child.metaInfo().isGraphicalItem()) {
+                if( child.metaInfo().isGraphicalItem() && (child.isRootNode() || acceptedModelNodeChildren(child.parentProperty().parentModelNode()).contains(child))) {
                     TimelineItem childItem = buildItemTree(child, depth + 1);
                     if(childItem.name() != "invalid_timelineitem")
                         item.addChild(childItem);

@@ -23,6 +23,7 @@ namespace QmlDesigner {
     QQmlContext *context();
 
     void setupModel();
+    void destroyModel();
     void emitSelectionChanged();
     void emitValueChanged();
 
