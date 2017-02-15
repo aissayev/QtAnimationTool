@@ -12,6 +12,7 @@
 #include "variantproperty.h"
 #include "bindingproperty.h"
 #include "nodeproperty.h"
+#include "nodelistproperty.h"
 #include "nodeabstractproperty.h"
 
 namespace QmlDesigner {
@@ -96,8 +97,6 @@ void TimelineQmlBackend::populateTimelineModel(TimelineItem item) {
 
 //Only works right now if animations are sub-models of their targets.
 void TimelineQmlBackend::loadKeyframes(TimelineItem *data, ModelNode node) {
-    qDebug() << node.properties().count();
-
     foreach(ModelNode child, node.directSubModelNodes()) {
         if (child.metaInfo().isSubclassOf("QtQuick.Animation")) {
             loadKeyframesHelper(data, node, child, 0);
@@ -127,7 +126,7 @@ int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parent
         return currentTime - startTime;
     }
     else if(node.metaInfo().isSubclassOf("QtQuick.PauseAnimation")) {
-        int duration = extractVariantProperty(node.property("duration")).toInt();
+        int duration = node.variantProperty("duration").value().toInt();
         return duration;
     }
     else if (node.metaInfo().isSubclassOf("QtQuick.PathAnimation")) {
@@ -135,14 +134,14 @@ int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parent
         return 0;
     }
     else if(node.metaInfo().isSubclassOf("QtQuick.Animation")){
-        PropertyKeyframePair *keyframe = buildKeyframe(data,parentNode,node,startTime);
+        PropertyKeyframePair *keyframe = buildKeyframe(data,node,startTime);
         data->addKeyframe(keyframe);
         return keyframe->duration();
     }
     return 0;
 }
 
-PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
+PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode node, int startTime) {
     QString propertyName;
     QVariant startValue;
     QVariant endValue;
@@ -221,14 +220,10 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
     return new PropertyKeyframePair(propertyName,startTime,duration,startValue,endValue,0);
 }
 
-QVariant TimelineQmlBackend::extractVariantProperty(AbstractProperty property) const{
-    Q_ASSERT(property.isVariantProperty());
-    return property.toVariantProperty().value();
-}
-
 QVariant TimelineQmlBackend::extractValueAtTime(QList<QObject*> keyframes, int startTime) const {
     int latestTime = 0;
     QVariant value = 0;
+
     foreach(QObject *object, keyframes) {
         PropertyKeyframePair *keyframe = (PropertyKeyframePair*)object;
         int frameStartTime = keyframe->startTime();
