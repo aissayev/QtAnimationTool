@@ -35,8 +35,8 @@
 namespace QmlDesigner {
 
   TimelineView::TimelineView(QObject* parent) :
-  AbstractView(parent),
-  m_backend(new TimelineQmlBackend(this))
+    AbstractView(parent),
+    m_backend(new TimelineQmlBackend(this))
   {
     Internal::TimelineContext *timelineContext = new Internal::TimelineContext(m_backend->widget());
     Core::ICore::addContextObject(timelineContext);
@@ -44,13 +44,8 @@ namespace QmlDesigner {
 
   TimelineView::~TimelineView()
   {
-//    if (m_widget && !m_widget->parent())
-//      delete m_widget;
-//  }
-
-//  void TimelineView::setupBackend(Model *model) {
-//    m_backend = new PropertyEditorBackend(this);
-//    m_backend->setModel(model);
+    if (m_backend && !m_backend->parent())
+      delete m_backend;
   }
 
   void TimelineView::modelAttached(Model *model)

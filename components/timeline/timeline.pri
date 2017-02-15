@@ -5,11 +5,13 @@ VPATH += $$PWD
 SOURCES += timelineview.cpp \
     timelinewidget.cpp \
     timelineqmlbackend.cpp \
-    timelinemodel.cpp
+    timelinemodel.cpp \
+    timelineimageprovider.cpp
 
 HEADERS += timelineview.h \
     timelinewidget.h \
     timelineqmlbackend.h \
-    timelinemodel.h
+    timelinemodel.h \
+    timelineimageprovider.h
 
 RESOURCES += timeline.qrc

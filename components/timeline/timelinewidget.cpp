@@ -70,7 +70,6 @@ TimelineWidget::TimelineWidget(TimelineView *view) :
     Theming::registerIconProvider(engine());
 
     setWindowTitle(tr("Timeline", "Title of timeline view"));
-    reloadQmlSource();
 }
 
 QString TimelineWidget::qmlSourcesPath() {
@@ -89,6 +88,11 @@ void TimelineWidget::reloadQmlSource()
     setFixedHeight(initialSize().height());
 
     connect(rootObject(), SIGNAL(expandedChanged()), this, SLOT(changeHeight()));
+}
+
+void TimelineWidget::init()
+{
+    reloadQmlSource();
 }
 
 void TimelineWidget::changeHeight()

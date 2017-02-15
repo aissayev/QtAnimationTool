@@ -48,6 +48,7 @@ public:
     TimelineWidget(TimelineView *view);
     QString contextHelpId() const;
     
+    void init();
     static QString qmlSourcesPath();
 
 signals:
