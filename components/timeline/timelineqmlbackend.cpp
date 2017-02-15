@@ -6,6 +6,7 @@
 #include "timelineqmlbackend.h"
 #include "timelineview.h"
 #include "timelinewidget.h"
+#include "timelineimageprovider.h"
 
 #include <QQmlContext>
 #include "variantproperty.h"
@@ -18,6 +19,7 @@ namespace QmlDesigner {
           m_timelineView(timelineView)
     {
         //please give the model to model tree
+        m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
     }
 
     void TimelineQmlBackend::setupModel() {
