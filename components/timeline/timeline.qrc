@@ -2,6 +2,10 @@
     <qresource prefix="/timeline/icon">
         <file>play.png</file>
         <file>play@2x.png</file>
+        <file>step-f.png</file>
+        <file>step-f@2x.png</file>
+        <file>step-b.png</file>
+        <file>step-b@2x.png</file>
         <file>zoom.png</file>
         <file>zoom@2x.png</file>
     </qresource>

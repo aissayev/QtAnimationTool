@@ -15,11 +15,14 @@
 namespace QmlDesigner {
     TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
         : m_model(new TimelineModel(this)),
-          m_widget(new TimelineWidget(timelineView)),
           m_timelineView(timelineView)
     {
-        //please give the model to model tree
+        if (!m_widget) {
+            m_widget = new TimelineWidget(timelineView);
+        }
         m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
+        context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
+        m_widget->init();
     }
 
     void TimelineQmlBackend::setupModel() {
