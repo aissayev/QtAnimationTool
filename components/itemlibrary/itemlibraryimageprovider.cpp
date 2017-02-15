@@ -45,8 +45,6 @@ QPixmap ItemLibraryImageProvider::requestPixmap(const QString &id, QSize *size, 
     QPixmap pixmap;
     pixmap = Utils::Icon(id).pixmap();
 
-    qDebug() << "ID: [" + id + "]";
-
     if (size) {
         size->setWidth(pixmap.width());
         size->setHeight(pixmap.height());

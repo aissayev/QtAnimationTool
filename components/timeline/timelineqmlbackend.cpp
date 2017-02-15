@@ -95,7 +95,7 @@ void TimelineQmlBackend::populateTimelineModel(TimelineItem item) {
     }
 }
 
-//Only works right now if animations are sub-models of their targets.
+//Only works right now if animations are sub-nodes of their targets.
 void TimelineQmlBackend::loadKeyframes(TimelineItem *data, ModelNode node) {
     foreach(ModelNode child, node.directSubModelNodes()) {
         if (child.metaInfo().isSubclassOf("QtQuick.Animation")) {
@@ -105,7 +105,7 @@ void TimelineQmlBackend::loadKeyframes(TimelineItem *data, ModelNode node) {
 }
 
 int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
-    qDebug() << node.simplifiedTypeName();
+    qDebug() << "Node:" << node.simplifiedTypeName();
     if(node.metaInfo().isSubclassOf("QtQuick.ParallelAnimation")) {
         int longestDuration = 0;
         foreach(ModelNode child, node.directSubModelNodes()) {
@@ -134,26 +134,23 @@ int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parent
         return 0;
     }
     else if(node.metaInfo().isSubclassOf("QtQuick.Animation")){
-        PropertyKeyframePair *keyframe = buildKeyframe(data,node,startTime);
+        PropertyKeyframePair *keyframe = buildKeyframe(data, parentNode, node, startTime);
         data->addKeyframe(keyframe);
         return keyframe->duration();
     }
     return 0;
 }
 
-PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode node, int startTime) {
+PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
     QString propertyName;
     QVariant startValue;
     QVariant endValue;
 
     int duration = 0;
 
-    foreach (PropertyName names, node.propertyNames()) {
-        qDebug() << names;
-    }
-
     qDebug() << "Parsing Binding Properties";
     foreach (BindingProperty property, node.bindingProperties()) {
+        qDebug() << "Property" << property.name();
         if (property.name() == "property") {
             propertyName = property.expression();
         }
@@ -170,6 +167,7 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
 
     qDebug() << "Parsing Variant Properties";
     foreach(VariantProperty property, node.variantProperties()) {
+        qDebug() << "Property" << property.name();
         if (property.name() == "duration") {
             duration = property.value().toInt();
         }
@@ -211,8 +209,20 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
     if (startValue.isNull()) {
         if(data->propertyMap().contains(propertyName))
             startValue = extractValueAtTime(data->propertyMap()[propertyName],startTime);
-        else
-            qDebug() << propertyName << "doesn't work";
+        else {
+            AbstractProperty parentProp = parentNode.property(propertyName.toLatin1());
+            if (parentProp.isValid()) {
+                if (parentProp.isBindingProperty()) {
+                    startValue = parentProp.toBindingProperty().expression();
+                }
+                else if (parentProp.isVariantProperty()) {
+                    startValue = parentProp.toVariantProperty().value();
+                }
+            }
+            else {
+                qDebug() << "invalid property " << propertyName;
+            }
+        }
     }
 
     qDebug() << "Keyframe built: [" << propertyName << " : " << startTime << " : " << startValue << "]";
