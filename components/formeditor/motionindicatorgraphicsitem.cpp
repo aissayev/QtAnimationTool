@@ -15,7 +15,11 @@ namespace QmlDesigner {
 MotionIndicatorGraphicsItem::MotionIndicatorGraphicsItem(QGraphicsItem *parent) :
     QGraphicsObject(parent)
 {
-    setZValue(-3);
+}
+
+QRectF MotionIndicatorGraphicsItem::boundingRect() const
+{
+    return m_boundingRect;
 }
 
 void MotionIndicatorGraphicsItem::readMotionPoints()

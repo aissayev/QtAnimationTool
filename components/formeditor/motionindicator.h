@@ -2,10 +2,15 @@
 
 #include "layeritem.h"
 #include "formeditoritem.h"
+#include "motionindicatorgraphicsitem.h"
 
 #include <QPointer>
 
 namespace QmlDesigner {
+
+class FormEditorItem;
+class MotionIndicatorGraphicsItem;
+
 class MotionIndicator
 {
 public:
@@ -22,5 +27,6 @@ public:
     void updateItems(const QList<FormEditorItem *> &itemList);
 private:
     QPointer<LayerItem> m_layerItem;
+    QPointer<MotionIndicatorGraphicsItem> m_motionItem;
 };
 }

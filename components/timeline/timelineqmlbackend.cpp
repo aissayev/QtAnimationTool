@@ -66,15 +66,14 @@ void TimelineQmlBackend::destroyModel() {
     m_model = new TimelineModel(this);
 }
 
-TimelineItem TimelineQmlBackend::buildItemTree(ModelNode parent, int depth) {
-    if (parent.isValid()) {
-        QString name = parent.hasId() ? parent.id() : parent.simplifiedTypeName();
-
-        const ModelNode constParent = parent;
+TimelineItem TimelineQmlBackend::buildItemTree(ModelNode node, int depth) {
+    if (node.isValid()) {
+        QString name = node.hasId() ? node.id() : node.simplifiedTypeName();
+        const ModelNode constParent = node;
         TimelineItem item = TimelineItem(name, getNodeIconUrl(constParent), depth);
-        loadKeyframes(&item, parent);
+        loadKeyframes(&item, node);
 
-        foreach(ModelNode child, parent.directSubModelNodes()) {
+        foreach(ModelNode child, node.directSubModelNodes()) {
             if( child.metaInfo().isGraphicalItem() && (child.isRootNode() || acceptedModelNodeChildren(child.parentProperty().parentModelNode()).contains(child))) {
                 TimelineItem childItem = buildItemTree(child, depth + 1);
                 if(childItem.name() != "invalid_timelineitem")

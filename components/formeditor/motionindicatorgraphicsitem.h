@@ -10,15 +10,18 @@ class MotionIndicatorGraphicsItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    MotionIndicatorGraphicsItem(QGraphicsItem *parent);
+    explicit MotionIndicatorGraphicsItem(QGraphicsItem *parent = 0);
 
 //    void setFormEditorItem(FormEditorItem *formEditorItem);
 //    FormEditorItem *formEditorItem() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const;
+
     void readMotionPoints();
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QList<QPointF> m_motionPoints;
+    QRectF m_boundingRect;
     FormEditorItem *m_formEditorItem;
 };
 }
