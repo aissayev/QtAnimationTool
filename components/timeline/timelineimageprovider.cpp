@@ -35,7 +35,7 @@ QPixmap TimelineImageProvider::requestPixmap(const QString &id, QSize *size, con
         result = Icon({ {QLatin1String(":/timeline/icon/record.png"), Theme::IconsBaseColor}},Icon::Tint).pixmap();
     }
     else if (id == "record-h") {
-        result = Icon({ {QLatin1String(":/timeline/icon/record.png"), Theme::QmlDesigner_HighlightColor}},Icon::Tint).pixmap();
+        result = Icon({ {QLatin1String(":/timeline/icon/record.png"), Theme::IconsErrorColor}},Icon::Tint).pixmap();
     }
     else if (id == "zoom") {
         result = Icon({ {QLatin1String(":/timeline/icon/zoom.png"), Theme::IconsBaseColor}},Icon::Tint).pixmap();

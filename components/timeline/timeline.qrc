@@ -8,5 +8,7 @@
         <file>step-b@2x.png</file>
         <file>zoom.png</file>
         <file>zoom@2x.png</file>
+        <file>record.png</file>
+        <file>record@2x.png</file>
     </qresource>
 </RCC>
