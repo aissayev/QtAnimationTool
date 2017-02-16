@@ -24,12 +24,16 @@ QRectF MotionIndicatorGraphicsItem::boundingRect() const
 
 void MotionIndicatorGraphicsItem::readMotionPoints()
 {
-    ModelNode modelNode = m_formEditorItem->qmlItemNode().modelNode();
-    foreach (ModelNode child, modelNode.directSubModelNodes()) {
-        if (child.simplifiedTypeName().contains("Animation")) {
+//    ModelNode modelNode = m_formEditorItem->qmlItemNode().modelNode();
+//    foreach (ModelNode child, modelNode.directSubModelNodes()) {
+//        if (child.simplifiedTypeName().contains("Animation")) {
 
-        }
-    }
+//        }
+//    }
+}
+
+void MotionIndicatorGraphicsItem::addMotionPoint(QPointF point) {
+    m_motionPoints.append(point);
 }
 
 void MotionIndicatorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /* option */, QWidget * /* widget */)
@@ -46,9 +50,11 @@ void MotionIndicatorGraphicsItem::paint(QPainter *painter, const QStyleOptionGra
     QPointF prevPoint = points.takeFirst();
 
     foreach (QPointF point, points) {
-            painter-> drawLine(prevPoint, point);
+            painter->drawRect(QRect(prevPoint.x() - 5, prevPoint.y() - 5, 10, 10));
+            painter->drawLine(prevPoint, point);
             prevPoint = point;
         }
+    painter->drawRect(QRect(prevPoint.x() - 5, prevPoint.y() - 5, 10, 10));
     }
 
     painter->restore();

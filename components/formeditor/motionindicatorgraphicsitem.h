@@ -18,7 +18,7 @@ public:
     QRectF boundingRect() const;
 
     void readMotionPoints();
-
+    void addMotionPoint(QPointF point);
 private:
     QList<QPointF> m_motionPoints;
     QRectF m_boundingRect;

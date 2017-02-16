@@ -31,6 +31,7 @@
 #include "resizeindicator.h"
 #include "anchorindicator.h"
 #include "bindingindicator.h"
+#include "motionindicator.h"
 #include "contentnoteditableindicator.h"
 
 #include <QTime>
@@ -86,6 +87,7 @@ private:
     ResizeIndicator m_resizeIndicator;
     AnchorIndicator m_anchorIndicator;
     BindingIndicator m_bindingIndicator;
+    MotionIndicator m_motionIndicator;
     ContentNotEditableIndicator m_contentNotEditableIndicator;
     QTime m_mousePressTimer;
     QCursor m_cursor;
