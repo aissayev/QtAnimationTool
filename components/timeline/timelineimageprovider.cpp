@@ -19,6 +19,9 @@ QPixmap TimelineImageProvider::requestPixmap(const QString &id, QSize *size, con
     if (id == "play") {
         result = Icon({{QLatin1String(":/timeline/icon/play.png"), Theme::IconsBaseColor}},Icon::Tint).pixmap();
     }
+    if (id == "add-keyframe") {
+        result = Icon({{QLatin1String(":/timeline/icon/add-keyframe.png"), Theme::IconsBaseColor}},Icon::Tint).pixmap();
+    }
     else if (id == "to-end") {
         result = Icon({ {QLatin1String(":/timeline/icon/to-end.png"), Theme::IconsBaseColor}},Icon::Tint).pixmap();
     }
