@@ -9,6 +9,7 @@
 #include "timelineimageprovider.h"
 
 #include <QQmlContext>
+#include <QDebug>
 #include "variantproperty.h"
 #include "bindingproperty.h"
 #include "nodeproperty.h"

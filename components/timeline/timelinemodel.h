@@ -43,7 +43,7 @@ namespace QmlDesigner {
     int depth() const;
 
     QMap<QString,QList<QObject*>> propertyMap() const;
-    QList<QString> properties() const ;
+    QStringList properties() const ;
     QList<QObject*> keyframes() const ;
     QList<TimelineItem> *children();
 

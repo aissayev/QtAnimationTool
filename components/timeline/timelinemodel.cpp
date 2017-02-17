@@ -1,9 +1,8 @@
 #include "timelinemodel.h"
 
 #include <QAbstractItemModel>
-
+#include <QDebug>
 namespace QmlDesigner {
-
   PropertyKeyframePair::PropertyKeyframePair(QObject *parent) : QObject(parent) {
 
   }
@@ -60,8 +59,8 @@ namespace QmlDesigner {
     return m_keyframes;
   }
 
-  QList<QString> TimelineItem::properties() const {
-    return m_propertyMap.keys();
+  QStringList TimelineItem::properties() const {
+      return m_propertyMap.uniqueKeys();
   }
 
   QList<TimelineItem> *TimelineItem::children() {
