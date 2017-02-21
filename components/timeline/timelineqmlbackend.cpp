@@ -47,7 +47,7 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
         m_widget = new TimelineWidget(timelineView);
     }
     m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
-    context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
+    context()->setContextProperty(QLatin1String("modelTree"), m_model);
     m_widget->init();
 }
 
