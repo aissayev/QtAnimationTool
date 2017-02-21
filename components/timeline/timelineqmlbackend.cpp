@@ -33,11 +33,12 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
-    context()->setContextProperty(QLatin1String("availableItemList"), QVariant::fromValue(fetchAvailableItemIds()));
+    context()->setContextProperty(QLatin1String("availableItemList"), fetchAvailableItemIds());
 
     connect(m_widget->rootContext(), SIGNAL(setTimeline(QString timelineId)), this, SLOT(setTimeline(QString timelineId)));
 
     m_widget->init();
+
 }
 
 void TimelineQmlBackend::setupModel() {
@@ -56,7 +57,7 @@ void TimelineQmlBackend::setupModel() {
 
     // Pass model to context
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
-    context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
+    context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(QStringList(m_timelineIdList)));
 }
 
 void TimelineQmlBackend::destroyModel() {
@@ -80,7 +81,7 @@ void TimelineQmlBackend::fetchTimelineIds() {
 }
 
 void TimelineQmlBackend::fillModelIdMap() {
-    foreach(ModelNode child, m_rootModelNode.allSubModelNodes()) {
+    foreach(ModelNode child, m_rootModelNode.allSubModelNodesAndThisNode()) {
         if(child.hasId())
            m_modelIdMap.insert(child.id(),child);
     }
@@ -103,16 +104,9 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     else
         qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
 
-    foreach(TimelineItem item, m_itemIdMap.values()) {
+    foreach(TimelineItem item, m_itemIdMap.values())
         m_timelineModel->addItem(item);
-        qDebug() << "Item: " << item.id();
-        foreach(QString propertyName, item.propertyMap().keys()) {
-            qDebug() << "    [" << propertyName << "] Keyframes: " << item.propertyMap()[propertyName].size();
-        }
-    }
-
-
-    context()->setContextProperty(QLatin1String("availableItemlist"), QVariant::fromValue(fetchAvailableItemIds()));
+    context()->setContextProperty(QLatin1String("availableItemlist"), fetchAvailableItemIds());
 }
 
 void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimation) {
@@ -175,7 +169,7 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
         else if (property.name() == "from") {
             startValue = property.value();
         }
-        else if(property.name() == "property") {
+        else if (property.name() == "property") {
             propertyName = property.value().toString();
         }
     }
@@ -223,11 +217,12 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
     return new PropertyKeyframePair(propertyName,startTime,duration,startValue,endValue,0);
 }
 
-QList<QString> TimelineQmlBackend::fetchAvailableItemIds() {
-    QList<QString> availableItemIds = QList<QString>();
-    foreach(QString id, m_modelIdMap.keys()) {
-        if(!m_itemIdMap.keys().contains(id) && !m_modelIdMap[id].metaInfo().isSubclassOf("QtQuick.Animation"))
+QStringList TimelineQmlBackend::fetchAvailableItemIds() {
+    QStringList availableItemIds;
+    foreach(QString id, m_modelIdMap.uniqueKeys()) {
+        if(!m_itemIdMap.uniqueKeys().contains(id) && !m_modelIdMap[id].metaInfo().isSubclassOf("QtQuick.Animation")) {
             availableItemIds.append(id);
+        }
     }
     return availableItemIds;
 }
