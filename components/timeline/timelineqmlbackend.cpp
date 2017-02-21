@@ -18,130 +18,115 @@
 
 namespace QmlDesigner {
 
-//Helper functions
-
-QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode)
-{
-    QList<ModelNode> children;
-    PropertyNameList properties;
-
-    if (parentNode.metaInfo().hasDefaultProperty())
-        properties.append(parentNode.metaInfo().defaultPropertyName());
-
-    foreach (const PropertyName &propertyName, properties) {
-        AbstractProperty property(parentNode.property(propertyName));
-        if (property.isNodeAbstractProperty())
-            children.append(property.toNodeAbstractProperty().directSubNodes());
-    }
-
-    return children;
-}
-
 //Class
 
 TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
-    : m_model(new TimelineModel(this)),
+    : m_timelineModel(new TimelineModel(this)),
+      m_timelineIdList(),
+      m_itemIdMap(),
+      m_modelIdMap(),
       m_timelineView(timelineView)
 {
     if (!m_widget) {
         m_widget = new TimelineWidget(timelineView);
     }
     m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
-    context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
+    context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
     m_widget->init();
 }
 
 void TimelineQmlBackend::setupModel() {
+    // Load root model node
     m_rootModelNode = m_timelineView->rootModelNode();
-    qDebug() << "Keyframe debug: [ property  :  start time  :  start value ]";
-    TimelineItem rootItem = buildItemTree(m_rootModelNode, 1);
-    qDebug() << "Populating timeline model.";
-    populateTimelineModel(rootItem);
-    qDebug() << "Finished populating timeline model.";
-    context()->setContextProperty(QLatin1String("modelTree"), QVariant::fromValue(m_model));
+
+    // Log all timelines present in qml
+    fetchTimelineIds();
+
+    // Log all model nodes that have an id that are present in qml
+    fillModelIdMap();
+
+    // Load timeline from qml if there is one
+    if(!m_timelineIdList.isEmpty())
+        constructTimeline(m_timelineIdList.first());
+
+    // Pass model to context
+    context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
 }
 
 void TimelineQmlBackend::destroyModel() {
     qDebug() << "Called";
-    delete(m_model);
-    m_model = new TimelineModel(this);
+    delete(m_timelineModel);
+    m_timelineModel = new TimelineModel(this);
+    m_itemIdMap = QMap<QString,TimelineItem>();
+    m_modelIdMap = QMap<QString,ModelNode>();
+    m_timelineIdList = QList<QString>();
 }
 
-TimelineItem TimelineQmlBackend::buildItemTree(ModelNode node, int depth) {
-    if (node.isValid()) {
-        QString name = node.hasId() ? node.id() : node.simplifiedTypeName();
-        const ModelNode constParent = node;
-        TimelineItem item = TimelineItem(name, getNodeIconUrl(constParent), depth);
-        loadKeyframes(&item, node);
+void TimelineQmlBackend::fetchTimelineIds() {
+    foreach(ModelNode child, m_rootModelNode.directSubModelNodes()) {
+        if(child.metaInfo().isSubclassOf("QtQuick.ParallelAnimation")) {
+            if(child.hasId())
+                m_timelineIdList.append(child.id());
+        }
+        else
+            qDebug() << "Timeline root found with no id. Ignored";
+    }
+}
 
-        foreach(ModelNode child, node.directSubModelNodes()) {
-            if( child.metaInfo().isGraphicalItem() && (child.isRootNode() || acceptedModelNodeChildren(child.parentProperty().parentModelNode()).contains(child))) {
-                TimelineItem childItem = buildItemTree(child, depth + 1);
-                if(childItem.name() != "invalid_timelineitem")
-                    item.addChild(childItem);
+void TimelineQmlBackend::fillModelIdMap() {
+    foreach(ModelNode child, m_rootModelNode.allSubModelNodes()) {
+        if(child.hasId())
+           m_modelIdMap.insert(child.id(),child);
+    }
+}
+
+void TimelineQmlBackend::constructTimeline(QString timelineId) {
+    delete(m_timelineModel);
+    m_timelineModel = new TimelineModel(this);
+    m_itemIdMap = QMap<QString,TimelineItem>();
+
+    if(m_modelIdMap.contains(timelineId)){
+        foreach(ModelNode child, m_modelIdMap[timelineId].directSubModelNodes()) {
+            constructTimelineForItem(child);
+        }
+    }
+    else
+        qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
+}
+
+void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimation) {
+    foreach(ModelNode child, itemParallelAnimation.directSubModelNodes()) {
+        constructTimelineForItemProperty(child);
+    }
+}
+
+void TimelineQmlBackend::constructTimelineForItemProperty(ModelNode itemSequentialAnimation) {
+    int time = 0;
+    foreach(ModelNode child, itemSequentialAnimation.directSubModelNodes()) {
+        if(child.metaInfo().isSubclassOf("QtQuick.PauseAnimation"))
+            time += child.variantProperty("duration").value().toInt();
+        else if(child.metaInfo().isSubclassOf("QtQuick.PropertyAnimation")) {
+            QString targetId = child.bindingProperty("target").expression();
+
+            if(!m_itemIdMap.contains(targetId)) {
+                if(!m_modelIdMap.contains(targetId)) {
+                    qDebug() << "Animation could not be linked to model[" << targetId << "]";
+                    continue;
+                }
+                const ModelNode targetModel = m_modelIdMap[targetId];
+                TimelineItem item(targetModel.simplifiedTypeName(),targetId,getNodeIconUrl(targetModel));
+                m_itemIdMap.insert(targetId,item);
+                m_timelineModel->addItem(m_itemIdMap[targetId]);
             }
-        }
-        return item;
-    }
-    return TimelineItem("invalid_timelineitem","",-1);
-}
 
-void TimelineQmlBackend::populateTimelineModel(TimelineItem item) {
-    m_model->addItem(item);
-
-    QList<TimelineItem> *children = item.children();
-    foreach(TimelineItem child, *children) {
-        populateTimelineModel(child);
-    }
-}
-
-//Only works right now if animations are sub-nodes of their targets.
-void TimelineQmlBackend::loadKeyframes(TimelineItem *data, ModelNode node) {
-    foreach(ModelNode child, node.directSubModelNodes()) {
-        if (child.metaInfo().isSubclassOf("QtQuick.Animation")) {
-            loadKeyframesHelper(data, node, child, 0);
+            PropertyKeyframePair *keyframe = constructKeyframe(&m_itemIdMap[targetId],m_modelIdMap[targetId],child, time);
+            time += keyframe->duration();
+            m_itemIdMap[targetId].addKeyframe(keyframe);
         }
     }
 }
 
-int TimelineQmlBackend::loadKeyframesHelper(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
-    qDebug() << "Node:" << node.simplifiedTypeName();
-    if(node.metaInfo().isSubclassOf("QtQuick.ParallelAnimation")) {
-        int longestDuration = 0;
-        foreach(ModelNode child, node.directSubModelNodes()) {
-            if (child.metaInfo().isSubclassOf("QtQuick.Animation")){
-                int duration = loadKeyframesHelper(data, parentNode, child, startTime);
-                if(duration > longestDuration)
-                    longestDuration = duration;
-            }
-        }
-        return longestDuration;
-    }
-    else if(node.metaInfo().isSubclassOf("QtQuick.SequentialAnimation")) {
-        int currentTime = startTime;
-        foreach(ModelNode child, node.directSubModelNodes()) {
-            if (child.metaInfo().isSubclassOf("QtQuick.Animation"))
-                currentTime += loadKeyframesHelper(data, parentNode, child, currentTime);
-        }
-        return currentTime - startTime;
-    }
-    else if(node.metaInfo().isSubclassOf("QtQuick.PauseAnimation")) {
-        int duration = node.variantProperty("duration").value().toInt();
-        return duration;
-    }
-    else if (node.metaInfo().isSubclassOf("QtQuick.PathAnimation")) {
-        qDebug() << "PathAnimation is currently unsupported";
-        return 0;
-    }
-    else if(node.metaInfo().isSubclassOf("QtQuick.Animation")){
-        PropertyKeyframePair *keyframe = buildKeyframe(data, parentNode, node, startTime);
-        data->addKeyframe(keyframe);
-        return keyframe->duration();
-    }
-    return 0;
-}
-
-PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime) {
+PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime) {
     QString propertyName;
     QVariant startValue;
     QVariant endValue;
@@ -149,7 +134,7 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
     int duration = 0;
 
     qDebug() << "Parsing Binding Properties";
-    foreach (BindingProperty property, node.bindingProperties()) {
+    foreach (BindingProperty property, animationNode.bindingProperties()) {
         qDebug() << "Property" << property.name();
         if (property.name() == "property") {
             propertyName = property.expression();
@@ -166,7 +151,7 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
     }
 
     qDebug() << "Parsing Variant Properties";
-    foreach(VariantProperty property, node.variantProperties()) {
+    foreach(VariantProperty property, animationNode.variantProperties()) {
         qDebug() << "Property" << property.name();
         if (property.name() == "duration") {
             duration = property.value().toInt();
@@ -182,41 +167,41 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
         }
     }
 
-    if (node.metaInfo().isSubclassOf("QtQuick.Animator") && propertyName.isEmpty())
+    if (animationNode.metaInfo().isSubclassOf("QtQuick.Animator") && propertyName.isEmpty())
     {
-        qDebug() << node.metaInfo().typeName();
-        if (node.metaInfo().isSubclassOf("QtQuick.YAnimator")) {
+        qDebug() << animationNode.metaInfo().typeName();
+        if (animationNode.metaInfo().isSubclassOf("QtQuick.YAnimator")) {
             propertyName = "y";
         }
-        else if (node.metaInfo().isSubclassOf("QtQuick.XAnimator")) {
+        else if (animationNode.metaInfo().isSubclassOf("QtQuick.XAnimator")) {
             propertyName = "x";
         }
-        else if (node.metaInfo().isSubclassOf("QtQuick.ScaleAnimator")) {
+        else if (animationNode.metaInfo().isSubclassOf("QtQuick.ScaleAnimator")) {
             propertyName = "scale";
         }
-        else if (node.metaInfo().isSubclassOf("QtQuick.OpacityAnimator")) {
+        else if (animationNode.metaInfo().isSubclassOf("QtQuick.OpacityAnimator")) {
             propertyName = "opacity";
         }
-        else if (node.metaInfo().isSubclassOf("QtQuick.RotationAnimator")) {
+        else if (animationNode.metaInfo().isSubclassOf("QtQuick.RotationAnimator")) {
             propertyName = "rotation";
         }
-        else if (node.metaInfo().isSubclassOf("QtQuick.UniformAnimator")) {
+        else if (animationNode.metaInfo().isSubclassOf("QtQuick.UniformAnimator")) {
             qDebug() << "Uniforms not supported yet";
             propertyName = "unsupported";
         }
     }
 
     if (startValue.isNull()) {
-        if(data->propertyMap().contains(propertyName))
-            startValue = extractValueAtTime(data->propertyMap()[propertyName],startTime);
+        if(item->propertyMap().contains(propertyName))
+            startValue = extractValueAtTime(item->propertyMap()[propertyName],startTime);
         else {
-            AbstractProperty parentProp = parentNode.property(propertyName.toLatin1());
-            if (parentProp.isValid()) {
-                if (parentProp.isBindingProperty()) {
-                    startValue = parentProp.toBindingProperty().expression();
+            AbstractProperty modelProp = modelNode.property(propertyName.toLatin1());
+            if (modelProp.isValid()) {
+                if (modelProp.isBindingProperty()) {
+                    startValue = modelProp.toBindingProperty().expression();
                 }
-                else if (parentProp.isVariantProperty()) {
-                    startValue = parentProp.toVariantProperty().value();
+                else if (modelProp.isVariantProperty()) {
+                    startValue = modelProp.toVariantProperty().value();
                 }
             }
             else {
@@ -228,6 +213,33 @@ PropertyKeyframePair *TimelineQmlBackend::buildKeyframe(TimelineItem *data, Mode
     qDebug() << "Keyframe built: [" << propertyName << " : " << startTime << " : " << startValue << "]";
 
     return new PropertyKeyframePair(propertyName,startTime,duration,startValue,endValue,0);
+}
+
+TimelineModel *TimelineQmlBackend::model() {
+    return m_timelineModel;
+}
+
+TimelineWidget *TimelineQmlBackend::widget() {
+    return m_widget;
+}
+
+QQmlContext *TimelineQmlBackend::context() {
+    return m_widget->rootContext();
+}
+
+QString TimelineQmlBackend::getNodeIconUrl(ModelNode modelNode) {
+    if (modelNode.isValid()) {
+        // if node has no own icon, search for it in the itemlibrary
+        const ItemLibraryInfo *libraryInfo = modelNode.model()->metaInfo().itemLibraryInfo();
+        QList <ItemLibraryEntry> itemLibraryEntryList = libraryInfo->entriesForType(
+                    modelNode.type(), modelNode.majorVersion(), modelNode.minorVersion());
+        if (!itemLibraryEntryList.isEmpty()) {
+            return QStringLiteral("image://qmldesigner_itemlibrary/") + itemLibraryEntryList.first().libraryEntryIconPath();
+        }
+        else if (modelNode.metaInfo().isValid())
+            return QStringLiteral("image://qmldesigner_itemlibrary/");
+    }
+    return QStringLiteral("image://qmldesigner_itemlibrary/");
 }
 
 QVariant TimelineQmlBackend::extractValueAtTime(QList<QObject*> keyframes, int startTime) const {
@@ -248,38 +260,21 @@ QVariant TimelineQmlBackend::extractValueAtTime(QList<QObject*> keyframes, int s
     return value;
 }
 
-TimelineModel *TimelineQmlBackend::model() {
-    return m_model;
-}
+QList<ModelNode> TimelineQmlBackend::acceptedModelNodeChildren(const ModelNode &parentNode)
+{
+    QList<ModelNode> children;
+    PropertyNameList properties;
 
-TimelineWidget *TimelineQmlBackend::widget() {
-    return m_widget;
-}
+    if (parentNode.metaInfo().hasDefaultProperty())
+        properties.append(parentNode.metaInfo().defaultPropertyName());
 
-QQmlContext *TimelineQmlBackend::context() {
-    return m_widget->rootContext();
-}
-
-void TimelineQmlBackend::emitSelectionChanged() {
-
-}
-
-void TimelineQmlBackend::emitValueChanged() {
-
-}
-
-QString TimelineQmlBackend::getNodeIconUrl(ModelNode modelNode) {
-    if (modelNode.isValid()) {
-        // if node has no own icon, search for it in the itemlibrary
-        const ItemLibraryInfo *libraryInfo = modelNode.model()->metaInfo().itemLibraryInfo();
-        QList <ItemLibraryEntry> itemLibraryEntryList = libraryInfo->entriesForType(
-                    modelNode.type(), modelNode.majorVersion(), modelNode.minorVersion());
-        if (!itemLibraryEntryList.isEmpty()) {
-            return QStringLiteral("image://qmldesigner_itemlibrary/") + itemLibraryEntryList.first().libraryEntryIconPath();
-        }
-        else if (modelNode.metaInfo().isValid())
-            return QStringLiteral("image://qmldesigner_itemlibrary/");
+    foreach (const PropertyName &propertyName, properties) {
+        AbstractProperty property(parentNode.property(propertyName));
+        if (property.isNodeAbstractProperty())
+            children.append(property.toNodeAbstractProperty().directSubNodes());
     }
-    return QStringLiteral("image://qmldesigner_itemlibrary/");
+
+    return children;
 }
+
 }

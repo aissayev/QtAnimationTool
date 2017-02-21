@@ -3,6 +3,11 @@
 #include <QAbstractItemModel>
 #include <QDebug>
 namespace QmlDesigner {
+
+  // -----------------------------------------------------------------------------
+  // Keyframe
+  // -----------------------------------------------------------------------------
+
   PropertyKeyframePair::PropertyKeyframePair(QObject *parent) : QObject(parent) {
 
   }
@@ -33,13 +38,25 @@ namespace QmlDesigner {
       return m_endValue;
   }
 
-  TimelineItem::TimelineItem(const QString &name, const QString &iconPath, const int &depth)
-    : m_name(name),
-      m_iconPath(iconPath),
-      m_depth(depth),
+  // -----------------------------------------------------------------------------
+  // Timeline Item
+  // -----------------------------------------------------------------------------
+
+  TimelineItem::TimelineItem()
+    : m_name(""),
+      m_id(""),
+      m_iconPath(""),
       m_propertyMap(QMap<QString,QList<QObject*>>()),
-      m_keyframes(QList<QObject*>()),
-      m_children(QList<TimelineItem>())
+      m_keyframes(QList<QObject*>())
+  {
+  }
+
+  TimelineItem::TimelineItem(const QString &name, const QString &id, const QString &iconPath)
+    : m_name(name),
+      m_id(id),
+      m_iconPath(iconPath),
+      m_propertyMap(QMap<QString,QList<QObject*>>()),
+      m_keyframes(QList<QObject*>())
   {
   }
 
@@ -47,12 +64,12 @@ namespace QmlDesigner {
     return m_name;
   }
 
-  QString TimelineItem::iconPath() const {
-    return m_iconPath;
+  QString TimelineItem::id() const {
+      return m_id;
   }
 
-  int TimelineItem::depth() const {
-    return m_depth;
+  QString TimelineItem::iconPath() const {
+    return m_iconPath;
   }
 
   QList<QObject*> TimelineItem::keyframes() const {
@@ -61,10 +78,6 @@ namespace QmlDesigner {
 
   QStringList TimelineItem::properties() const {
       return m_propertyMap.uniqueKeys();
-  }
-
-  QList<TimelineItem> *TimelineItem::children() {
-    return &m_children;
   }
 
   QMap<QString,QList<QObject*>> TimelineItem::propertyMap() const {
@@ -80,9 +93,9 @@ namespace QmlDesigner {
     m_propertyMap[property].append(keyframe);
   }
 
-  void TimelineItem::addChild(TimelineItem child) {
-      m_children.append(child);
-  }
+  // -----------------------------------------------------------------------------
+  // Timeline Model
+  // -----------------------------------------------------------------------------
 
   TimelineModel::TimelineModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -108,8 +121,6 @@ namespace QmlDesigner {
       return item.name();
     else if (role == IconPathRole)
       return item.iconPath();
-    else if (role == DepthRole)
-      return item.depth();
     else if (role == PropertyRole)
       return QVariant::fromValue(item.properties());
     else if (role == KeyframeRole)
@@ -121,7 +132,6 @@ namespace QmlDesigner {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
     roles[IconPathRole] = "iconPath";
-    roles[DepthRole] = "deep";
     roles[PropertyRole] = "properties";
     roles[KeyframeRole] = "keyframes";
     return roles;

@@ -36,27 +36,25 @@ namespace QmlDesigner {
   class TimelineItem
   {
   public: 
-    TimelineItem(const QString &name, const QString &iconPath, const int &depth);
+    TimelineItem();
+    TimelineItem(const QString &name, const QString &id, const QString &iconPath);
 
     QString name() const ;
+    QString id() const;
     QString iconPath() const;
-    int depth() const;
 
     QMap<QString,QList<QObject*>> propertyMap() const;
     QStringList properties() const ;
     QList<QObject*> keyframes() const ;
-    QList<TimelineItem> *children();
 
     void addKeyframe(PropertyKeyframePair *keyframe);
-    void addChild(TimelineItem child);
 
   private:
     QString m_name;
+    QString m_id;
     QString m_iconPath;
-    int m_depth;
     QMap<QString,QList<QObject*>> m_propertyMap;
     QList<QObject*> m_keyframes;
-    QList<TimelineItem> m_children;
   };
 
   class TimelineModel : public QAbstractListModel
@@ -66,7 +64,6 @@ namespace QmlDesigner {
   public:
     enum TimelineRoles {
       NameRole = Qt::UserRole +1,
-      DepthRole,
       IconPathRole,
       PropertyRole,
       KeyframeRole,
