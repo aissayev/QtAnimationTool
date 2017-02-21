@@ -46,6 +46,7 @@ namespace QmlDesigner {
     QMap<QString,QList<QObject*>> propertyMap() const;
     QStringList properties() const ;
     QList<QObject*> keyframes() const ;
+    QVariantList sortedKeyframes() const;
 
     void addKeyframe(PropertyKeyframePair *keyframe);
 
@@ -67,6 +68,7 @@ namespace QmlDesigner {
       IconPathRole,
       PropertyRole,
       KeyframeRole,
+      SortedKeyframeRole
     };
 
     TimelineModel(QObject *parent = 0);

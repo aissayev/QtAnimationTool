@@ -72,6 +72,14 @@ namespace QmlDesigner {
     return m_iconPath;
   }
 
+  QVariantList TimelineItem::sortedKeyframes() const {
+      QVariantList list;
+      foreach(QString property, m_propertyMap.uniqueKeys()) {
+          list.append(QVariant::fromValue(m_propertyMap[property]));
+      }
+      return list;
+  }
+
   QList<QObject*> TimelineItem::keyframes() const {
     return m_keyframes;
   }
@@ -125,6 +133,8 @@ namespace QmlDesigner {
       return QVariant::fromValue(item.properties());
     else if (role == KeyframeRole)
       return QVariant::fromValue(item.keyframes());
+    else if (role == SortedKeyframeRole)
+        return item.sortedKeyframes();
     return QVariant();
   }
 
@@ -134,6 +144,7 @@ namespace QmlDesigner {
     roles[IconPathRole] = "iconPath";
     roles[PropertyRole] = "properties";
     roles[KeyframeRole] = "keyframes";
+    roles[SortedKeyframeRole] = "sortedKeyframes";
     return roles;
   }
 }

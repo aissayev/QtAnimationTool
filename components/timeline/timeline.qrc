@@ -14,5 +14,7 @@
         <file>zoom@2x.png</file>
         <file>record.png</file>
         <file>record@2x.png</file>
+        <file>add-keyframe.png</file>
+        <file>add-keyframe@2x.png</file>
     </qresource>
 </RCC>

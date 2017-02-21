@@ -32,6 +32,9 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     }
     m_widget->engine()->addImageProvider(QStringLiteral("timeline"), new TimelineImageProvider());
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
+    context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
+    context()->setContextProperty(QLatin1String("availableItemList"), QVariant::fromValue(fetchAvailableItemIds()));
+
     m_widget->init();
 }
 
@@ -51,6 +54,7 @@ void TimelineQmlBackend::setupModel() {
 
     // Pass model to context
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
+    context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
 }
 
 void TimelineQmlBackend::destroyModel() {
@@ -92,6 +96,8 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     }
     else
         qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
+
+    context()->setContextProperty(QLatin1String("availableItemlist"), QVariant::fromValue(fetchAvailableItemIds()));
 }
 
 void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimation) {
@@ -215,16 +221,13 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
     return new PropertyKeyframePair(propertyName,startTime,duration,startValue,endValue,0);
 }
 
-TimelineModel *TimelineQmlBackend::model() {
-    return m_timelineModel;
-}
-
-TimelineWidget *TimelineQmlBackend::widget() {
-    return m_widget;
-}
-
-QQmlContext *TimelineQmlBackend::context() {
-    return m_widget->rootContext();
+QList<QString> TimelineQmlBackend::fetchAvailableItemIds() {
+    QList<QString> availableItemIds = QList<QString>();
+    foreach(QString id, m_modelIdMap.keys()) {
+        if(!m_itemIdMap.keys().contains(id) && !m_modelIdMap[id].metaInfo().isSubclassOf("QtQuick.Animation"))
+            availableItemIds.append(id);
+    }
+    return availableItemIds;
 }
 
 QString TimelineQmlBackend::getNodeIconUrl(ModelNode modelNode) {
@@ -275,6 +278,18 @@ QList<ModelNode> TimelineQmlBackend::acceptedModelNodeChildren(const ModelNode &
     }
 
     return children;
+}
+
+TimelineModel *TimelineQmlBackend::model() {
+    return m_timelineModel;
+}
+
+TimelineWidget *TimelineQmlBackend::widget() {
+    return m_widget;
+}
+
+QQmlContext *TimelineQmlBackend::context() {
+    return m_widget->rootContext();
 }
 
 }
