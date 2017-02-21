@@ -77,6 +77,7 @@ namespace QmlDesigner {
       foreach(QString property, m_propertyMap.uniqueKeys()) {
           list.append(QVariant::fromValue(m_propertyMap[property]));
       }
+      qDebug() << list.length();
       return list;
   }
 
@@ -127,6 +128,8 @@ namespace QmlDesigner {
     const TimelineItem &item = m_items[index.row()];
     if (role == NameRole)
       return item.name();
+    else if (role == IdRole)
+        return item.id();
     else if (role == IconPathRole)
       return item.iconPath();
     else if (role == PropertyRole)
@@ -141,6 +144,7 @@ namespace QmlDesigner {
   QHash<int, QByteArray> TimelineModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
+    roles[IdRole] = "id";
     roles[IconPathRole] = "iconPath";
     roles[PropertyRole] = "properties";
     roles[KeyframeRole] = "keyframes";

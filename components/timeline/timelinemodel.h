@@ -65,6 +65,7 @@ namespace QmlDesigner {
   public:
     enum TimelineRoles {
       NameRole = Qt::UserRole +1,
+      IdRole,
       IconPathRole,
       PropertyRole,
       KeyframeRole,

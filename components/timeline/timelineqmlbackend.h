@@ -51,7 +51,7 @@ namespace QmlDesigner {
     void constructTimelineForItem(ModelNode itemParallelAnimation);
     void constructTimelineForItemProperty(ModelNode itemSequentialAnimation);
     void fetchTimelineIds();
-    QList<QString> fetchAvailableItemIds();
+    QStringList fetchAvailableItemIds();
 
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
 
