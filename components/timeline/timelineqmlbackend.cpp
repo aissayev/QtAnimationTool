@@ -35,6 +35,8 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
     context()->setContextProperty(QLatin1String("availableItemList"), QVariant::fromValue(fetchAvailableItemIds()));
 
+    connect(m_widget->rootContext(), SIGNAL(setTimeline(QString timelineId)), this, SLOT(setTimeline(QString timelineId)));
+
     m_widget->init();
 }
 
@@ -84,6 +86,10 @@ void TimelineQmlBackend::fillModelIdMap() {
     }
 }
 
+void TimelineQmlBackend::setTimeline(QString timelineId) {
+    this->constructTimeline(timelineId);
+}
+
 void TimelineQmlBackend::constructTimeline(QString timelineId) {
     delete(m_timelineModel);
     m_timelineModel = new TimelineModel(this);
@@ -97,8 +103,14 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     else
         qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
 
-    foreach(TimelineItem item, m_itemIdMap.values())
+    foreach(TimelineItem item, m_itemIdMap.values()) {
         m_timelineModel->addItem(item);
+        qDebug() << "Item: " << item.id();
+        foreach(QString propertyName, item.propertyMap().keys()) {
+            qDebug() << "    [" << propertyName << "] Keyframes: " << item.propertyMap()[propertyName].size();
+        }
+    }
+
 
     context()->setContextProperty(QLatin1String("availableItemlist"), QVariant::fromValue(fetchAvailableItemIds()));
 }
@@ -110,7 +122,6 @@ void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimatio
 }
 
 void TimelineQmlBackend::constructTimelineForItemProperty(ModelNode itemSequentialAnimation) {
-    qDebug() << "Filling TimelineItem Keyframe List";
     int time = 0;
     foreach(ModelNode child, itemSequentialAnimation.directSubModelNodes()) {
         if(child.metaInfo().isSubclassOf("QtQuick.PauseAnimation"))
@@ -131,7 +142,6 @@ void TimelineQmlBackend::constructTimelineForItemProperty(ModelNode itemSequenti
             PropertyKeyframePair *keyframe = constructKeyframe(&m_itemIdMap[targetId],m_modelIdMap[targetId],child, time);
             time += keyframe->duration();
             m_itemIdMap[targetId].addKeyframe(keyframe);
-            qDebug() << "Adding keyframe for " << targetId;
         }
     }
 }

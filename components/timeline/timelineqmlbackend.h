@@ -56,5 +56,8 @@ namespace QmlDesigner {
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
 
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);
+
+  private slots:
+    void setTimeline(QString timelineId);
   };
 }
