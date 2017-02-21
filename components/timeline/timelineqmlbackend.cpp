@@ -71,9 +71,9 @@ void TimelineQmlBackend::fetchTimelineIds() {
         if(child.metaInfo().isSubclassOf("QtQuick.ParallelAnimation")) {
             if(child.hasId())
                 m_timelineIdList.append(child.id());
+            else
+                qDebug() << "Timeline root found with no id. Ignored";
         }
-        else
-            qDebug() << "Timeline root found with no id. Ignored";
     }
 }
 
@@ -97,6 +97,9 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     else
         qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
 
+    foreach(TimelineItem item, m_itemIdMap.values())
+        m_timelineModel->addItem(item);
+
     context()->setContextProperty(QLatin1String("availableItemlist"), QVariant::fromValue(fetchAvailableItemIds()));
 }
 
@@ -107,6 +110,7 @@ void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimatio
 }
 
 void TimelineQmlBackend::constructTimelineForItemProperty(ModelNode itemSequentialAnimation) {
+    qDebug() << "Filling TimelineItem Keyframe List";
     int time = 0;
     foreach(ModelNode child, itemSequentialAnimation.directSubModelNodes()) {
         if(child.metaInfo().isSubclassOf("QtQuick.PauseAnimation"))
@@ -122,12 +126,12 @@ void TimelineQmlBackend::constructTimelineForItemProperty(ModelNode itemSequenti
                 const ModelNode targetModel = m_modelIdMap[targetId];
                 TimelineItem item(targetModel.simplifiedTypeName(),targetId,getNodeIconUrl(targetModel));
                 m_itemIdMap.insert(targetId,item);
-                m_timelineModel->addItem(m_itemIdMap[targetId]);
             }
 
             PropertyKeyframePair *keyframe = constructKeyframe(&m_itemIdMap[targetId],m_modelIdMap[targetId],child, time);
             time += keyframe->duration();
             m_itemIdMap[targetId].addKeyframe(keyframe);
+            qDebug() << "Adding keyframe for " << targetId;
         }
     }
 }
@@ -139,9 +143,7 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
 
     int duration = 0;
 
-    qDebug() << "Parsing Binding Properties";
     foreach (BindingProperty property, animationNode.bindingProperties()) {
-        qDebug() << "Property" << property.name();
         if (property.name() == "property") {
             propertyName = property.expression();
         }
@@ -151,14 +153,9 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
         else if (property.name() == "to") {
             endValue = property.expression();
         }
-        else {
-            qDebug() << "Property" << property.name() << "is not recognized yet";
-        }
     }
 
-    qDebug() << "Parsing Variant Properties";
     foreach(VariantProperty property, animationNode.variantProperties()) {
-        qDebug() << "Property" << property.name();
         if (property.name() == "duration") {
             duration = property.value().toInt();
         }
@@ -168,14 +165,13 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
         else if (property.name() == "from") {
             startValue = property.value();
         }
-        else {
-            qDebug() << "Property" << property.name() << "is not recognized yet";
+        else if(property.name() == "property") {
+            propertyName = property.value().toString();
         }
     }
 
     if (animationNode.metaInfo().isSubclassOf("QtQuick.Animator") && propertyName.isEmpty())
     {
-        qDebug() << animationNode.metaInfo().typeName();
         if (animationNode.metaInfo().isSubclassOf("QtQuick.YAnimator")) {
             propertyName = "y";
         }
@@ -192,7 +188,6 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
             propertyName = "rotation";
         }
         else if (animationNode.metaInfo().isSubclassOf("QtQuick.UniformAnimator")) {
-            qDebug() << "Uniforms not supported yet";
             propertyName = "unsupported";
         }
     }
@@ -209,9 +204,6 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
                 else if (modelProp.isVariantProperty()) {
                     startValue = modelProp.toVariantProperty().value();
                 }
-            }
-            else {
-                qDebug() << "invalid property " << propertyName;
             }
         }
     }
