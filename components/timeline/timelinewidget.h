@@ -52,10 +52,13 @@ public:
     static QString qmlSourcesPath();
 
 signals:
+    void qmlReloaded();
 
 private slots:
-    void reloadQmlSource();
     void changeHeight();
+
+public slots:
+    void reloadQmlSource();
 
 private: // functions
     TimelineView *timelineView() const;

@@ -88,6 +88,7 @@ void TimelineWidget::reloadQmlSource()
     setFixedHeight(initialSize().height());
 
     connect(rootObject(), SIGNAL(expandedChanged()), this, SLOT(changeHeight()));
+    emit qmlReloaded();
 }
 
 void TimelineWidget::init()

@@ -117,6 +117,12 @@ namespace QmlDesigner {
     endInsertRows();
   }
 
+  void TimelineModel::reset() {
+      beginRemoveRows(QModelIndex(), 0, rowCount());
+      m_items.clear();
+      endRemoveRows();
+  }
+
   int TimelineModel::rowCount(const QModelIndex & parent) const {
     Q_UNUSED(parent);
     return m_items.count();

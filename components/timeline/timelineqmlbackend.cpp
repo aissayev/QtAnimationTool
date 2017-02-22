@@ -8,6 +8,7 @@
 #include "timelinewidget.h"
 #include "timelineimageprovider.h"
 
+#include <QQuickItem>
 #include <QQmlContext>
 #include <QDebug>
 #include "variantproperty.h"
@@ -19,6 +20,10 @@
 namespace QmlDesigner {
 
 //Class
+
+TimelineQmlBackend::TimelineQmlBackend(QObject *parent) : QObject(parent) {
+
+}
 
 TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     : m_timelineModel(new TimelineModel(this)),
@@ -35,9 +40,12 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
     context()->setContextProperty(QLatin1String("availableItemList"), fetchAvailableItemIds());
 
-    connect(m_widget->rootContext(), SIGNAL(setTimeline(QString timelineId)), this, SLOT(setTimeline(QString timelineId)));
 
     m_widget->init();
+
+    // Do the business
+    connect(m_widget,SIGNAL(qmlReloaded()),this,SLOT(reloadConnections()));
+    connect(m_widget->rootObject(), SIGNAL(setTimeline(QString)), this, SLOT(setTimeline(QString)));
 
 }
 
@@ -62,8 +70,7 @@ void TimelineQmlBackend::setupModel() {
 
 void TimelineQmlBackend::destroyModel() {
     qDebug() << "Called";
-    delete(m_timelineModel);
-    m_timelineModel = new TimelineModel(this);
+    m_timelineModel->reset();
     m_itemIdMap = QMap<QString,TimelineItem>();
     m_modelIdMap = QMap<QString,ModelNode>();
     m_timelineIdList = QList<QString>();
@@ -88,12 +95,17 @@ void TimelineQmlBackend::fillModelIdMap() {
 }
 
 void TimelineQmlBackend::setTimeline(QString timelineId) {
+    qDebug() << "[Backend] setTimeline(" << timelineId << ")";
     this->constructTimeline(timelineId);
 }
 
+void TimelineQmlBackend::reloadConnections() {
+    qDebug() << "[Backend] reloadConnections()";
+    connect(m_widget->rootObject(), SIGNAL(setTimeline(QString)), this, SLOT(setTimeline(QString)));
+}
+
 void TimelineQmlBackend::constructTimeline(QString timelineId) {
-    delete(m_timelineModel);
-    m_timelineModel = new TimelineModel(this);
+    m_timelineModel->reset();
     m_itemIdMap = QMap<QString,TimelineItem>();
 
     if(m_modelIdMap.contains(timelineId)){

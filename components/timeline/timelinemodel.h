@@ -74,6 +74,7 @@ namespace QmlDesigner {
 
     TimelineModel(QObject *parent = 0);
     void addItem(const TimelineItem &item);
+    void reset();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
   protected:

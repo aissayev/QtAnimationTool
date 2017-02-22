@@ -15,7 +15,9 @@ namespace QmlDesigner {
 
   class TimelineQmlBackend : public QObject
   {
+      Q_OBJECT
   public:
+    explicit TimelineQmlBackend(QObject *parent = 0);
     TimelineQmlBackend(TimelineView *timelineView);
 
     TimelineModel *model();
@@ -58,6 +60,7 @@ namespace QmlDesigner {
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);
 
   private slots:
+    void reloadConnections();
     void setTimeline(QString timelineId);
   };
 }
