@@ -39,24 +39,17 @@ namespace QmlDesigner {
     QPointer<TimelineView> m_timelineView;
     ModelNode m_rootModelNode;
 
-    //----------------------------------------------------------------------------
-    void loadKeyframes(TimelineItem *data, ModelNode node);
-    int loadKeyframesHelper(TimelineItem *data, ModelNode parentNode, ModelNode node, int startTime);
-    QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
-
-    TimelineItem buildItemTree(ModelNode parent, int depth);
-    void populateTimelineModel(TimelineItem item);
-    //----------------------------------------------------------------------------
+    int m_time;
 
     void fillModelIdMap();
     void constructTimeline(QString timelineId);
     void constructTimelineForItem(ModelNode itemParallelAnimation);
     void constructTimelineForItemProperty(ModelNode itemSequentialAnimation);
     void fetchTimelineIds();
+    QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
     QStringList fetchAvailableItemIds();
 
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
-
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);
 
   private slots:

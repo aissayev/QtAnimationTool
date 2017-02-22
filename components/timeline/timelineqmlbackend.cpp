@@ -32,6 +32,8 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
       m_modelIdMap(),
       m_timelineView(timelineView)
 {
+    m_time = 0;
+
     if (!m_widget) {
         m_widget = new TimelineWidget(timelineView);
     }
@@ -39,6 +41,7 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
     context()->setContextProperty(QLatin1String("availableItemList"), fetchAvailableItemIds());
+    context()->setContextProperty(QLatin1String("currentTime"), m_time);
 
 
     m_widget->init();
@@ -66,6 +69,7 @@ void TimelineQmlBackend::setupModel() {
     // Pass model to context
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(QStringList(m_timelineIdList)));
+    context()->setContextProperty(QLatin1String("currentTime"), m_time);
 }
 
 void TimelineQmlBackend::destroyModel() {
