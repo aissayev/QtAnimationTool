@@ -86,19 +86,12 @@ void TimelineWidget::reloadQmlSource()
 
     QTC_ASSERT(rootObject(), return);
     setFixedHeight(initialSize().height());
-
-    connect(rootObject(), SIGNAL(expandedChanged()), this, SLOT(changeHeight()));
     emit qmlReloaded();
 }
 
 void TimelineWidget::init()
 {
     reloadQmlSource();
-}
-
-void TimelineWidget::changeHeight()
-{
-    setFixedHeight(rootObject()->height());
 }
 
 QString TimelineWidget::contextHelpId() const

@@ -55,7 +55,6 @@ signals:
     void qmlReloaded();
 
 private slots:
-    void changeHeight();
 
 public slots:
     void reloadQmlSource();
