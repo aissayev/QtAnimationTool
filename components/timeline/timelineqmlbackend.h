@@ -33,6 +33,7 @@ namespace QmlDesigner {
   private:
     QPointer<TimelineModel> m_timelineModel;
     QList<QString> m_timelineIdList;
+    QStringList m_availableItemList;
     QMap<QString,TimelineItem> m_itemIdMap;
     QMap<QString,ModelNode> m_modelIdMap;
     QPointer<TimelineWidget> m_widget;
@@ -47,7 +48,7 @@ namespace QmlDesigner {
     void constructTimelineForItemProperty(ModelNode itemSequentialAnimation);
     void fetchTimelineIds();
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
-    QStringList fetchAvailableItemIds();
+    void updateAvailableItemList();
 
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);
