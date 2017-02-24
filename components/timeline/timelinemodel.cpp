@@ -138,6 +138,10 @@ namespace QmlDesigner {
     return m_items.count();
   }
 
+  QList<TimelineItem> TimelineModel::items() {
+      return m_items;
+  }
+
   TimelineItem *TimelineModel::getItemById(QString itemId) {
     int i;
     for(i=0; i<m_items.count(); i++) {

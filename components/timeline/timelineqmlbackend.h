@@ -33,6 +33,7 @@ namespace QmlDesigner {
   private:
     QPointer<TimelineModel> m_timelineModel;
     QList<QString> m_timelineIdList;
+    QString m_currentTimeline;
     QStringList m_availableItemList;
     QMap<QString,TimelineItem> m_itemIdMap;
     QMap<QString,ModelNode> m_modelIdMap;
@@ -50,6 +51,10 @@ namespace QmlDesigner {
     QVariant extractValue(ModelNode modelNode, TimelineItem *item, QString property, int startTime) const;
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
     void updateAvailableItemList();
+
+    ModelNode createModelNode(QString type);
+    void exportTimeline();
+    void exportTimelineItems(ModelNode timelineRoot);
 
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);

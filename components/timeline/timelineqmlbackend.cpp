@@ -64,8 +64,10 @@ void TimelineQmlBackend::setupModel() {
     fillModelIdMap();
 
     // Load timeline from qml if there is one
-    if(!m_timelineIdList.isEmpty())
-        constructTimeline(m_timelineIdList.first());
+    if(!m_timelineIdList.isEmpty()){
+        m_currentTimeline = m_timelineIdList.first();
+        constructTimeline(m_currentTimeline);
+    }
 
     // Pass model to context
     context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
@@ -110,11 +112,35 @@ void TimelineQmlBackend::setCurrentTime(int time) {
 void TimelineQmlBackend::setTimeline(QString timelineId) {
     qDebug() << "[Backend] setTimeline(" << timelineId << ")";
 
-    //--------------------
-    // Write changes to QML
-    //--------------------
-
+    this->exportTimeline();
     this->constructTimeline(timelineId);
+}
+
+void TimelineQmlBackend::exportTimeline() {
+    bool running = false;
+
+    if(m_modelIdMap.contains(m_currentTimeline)) {
+        running = m_modelIdMap[m_currentTimeline].variantProperty("running").value().toBool();
+        //destroy the model node
+    }
+
+    ModelNode timelineNode = createModelNode("QtQuick.ParallelAnimation");
+    m_rootModelNode.nodeAbstractProperty(m_rootModelNode.metaInfo().defaultPropertyName()).reparentHere(timelineNode);
+    timelineNode.setIdWithRefactoring(m_currentTimeline + "_new"); // will remove new tag after model destruction is implemented
+    timelineNode.variantProperty("running").setValue(running);
+
+    exportTimelineItems(timelineNode);
+}
+
+void TimelineQmlBackend::exportTimelineItems(ModelNode timelineRoot) {
+    foreach(TimelineItem item, m_timelineModel->items()) {
+        ModelNode itemNode = createModelNode("QtQuick.ParallelAnimation");
+        //timelineRoot.nodeAbstractProperty(m_rootModelNode.metaInfo().defaultPropertyName()).reparentHere(itemNode);
+    }
+}
+
+ModelNode TimelineQmlBackend::createModelNode(QString type) {
+    return m_timelineView->createModelNode(type.toLatin1(),m_rootModelNode.majorVersion(),m_rootModelNode.minorVersion());
 }
 
 void TimelineQmlBackend::addTimelineItem(QString timelineItemId) {
@@ -167,13 +193,12 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     m_timelineModel->reset();
     m_itemIdMap = QMap<QString,TimelineItem>();
 
+    // If timeline already exists, load previous data from QML
     if(m_modelIdMap.contains(timelineId)){
         foreach(ModelNode child, m_modelIdMap[timelineId].directSubModelNodes()) {
             constructTimelineForItem(child);
         }
     }
-    else
-        qDebug() << "Timeline [" << timelineId << "] was not found and could not be constructed";
 
     foreach(TimelineItem item, m_itemIdMap.values())
         m_timelineModel->addItem(item);

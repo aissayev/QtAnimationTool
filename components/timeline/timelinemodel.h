@@ -79,6 +79,7 @@ namespace QmlDesigner {
     void reset();
     TimelineItem *getItemById(QString itemId);
     void updateQmlTimelineItem(QString itemId);
+    QList<TimelineItem> items();
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
   protected:
