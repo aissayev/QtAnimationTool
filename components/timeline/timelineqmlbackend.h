@@ -47,6 +47,7 @@ namespace QmlDesigner {
     void constructTimelineForItem(ModelNode itemParallelAnimation);
     void constructTimelineForItemProperty(ModelNode itemSequentialAnimation);
     void fetchTimelineIds();
+    QVariant extractValue(ModelNode modelNode, TimelineItem *item, QString property, int startTime) const;
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
     void updateAvailableItemList();
 
@@ -55,6 +56,10 @@ namespace QmlDesigner {
 
   private slots:
     void reloadConnections();
+    void setCurrentTime(int time);
     void setTimeline(QString timelineId);
+    void addTimelineItem(QString itemId);
+    void addTimelineItemProperty(QString itemId,QString propertyName);
+    void addKeyframe(QString itemId, QString propertyName, int time);
   };
 }

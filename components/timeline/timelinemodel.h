@@ -9,8 +9,8 @@ namespace QmlDesigner {
   class PropertyKeyframePair: public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(int startTime READ startTime NOTIFY startTimeChanged)
-    Q_PROPERTY(int duration READ duration NOTIFY durationChanged)
+    Q_PROPERTY(int startTime READ startTime WRITE setStartTime NOTIFY startTimeChanged)
+    Q_PROPERTY(int duration READ duration WRITE setDuration NOTIFY durationChanged)
 
   public:
     explicit PropertyKeyframePair(QObject *parent=0);
@@ -18,7 +18,9 @@ namespace QmlDesigner {
 
     QString propertyName() const;
     int startTime() const ;
+    void setStartTime(int startTime);
     int duration() const ;
+    void setDuration(int duration);
     QVariant endValue() const ;
 
   private:
@@ -75,6 +77,8 @@ namespace QmlDesigner {
     TimelineModel(QObject *parent = 0);
     void addItem(const TimelineItem &item);
     void reset();
+    TimelineItem *getItemById(QString itemId);
+    void updateQmlTimelineItem(QString itemId);
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
   protected:

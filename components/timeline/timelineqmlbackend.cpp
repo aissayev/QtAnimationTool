@@ -49,7 +49,7 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
 
     // Do the business
     connect(m_widget,SIGNAL(qmlReloaded()),this,SLOT(reloadConnections()));
-    connect(m_widget->rootObject(), SIGNAL(setTimeline(QString)), this, SLOT(setTimeline(QString)));
+    reloadConnections();
 
 }
 
@@ -101,14 +101,66 @@ void TimelineQmlBackend::fillModelIdMap() {
     }
 }
 
+void TimelineQmlBackend::setCurrentTime(int time) {
+    qDebug() << "[backend] setCurrentTime(" << time << ")";
+    m_time = time;
+    context()->setContextProperty(QLatin1String("currentTime"), m_time);
+}
+
 void TimelineQmlBackend::setTimeline(QString timelineId) {
     qDebug() << "[Backend] setTimeline(" << timelineId << ")";
+
+    //--------------------
+    // Write changes to QML
+    //--------------------
+
     this->constructTimeline(timelineId);
 }
 
+void TimelineQmlBackend::addTimelineItem(QString timelineItemId) {
+    if(m_modelIdMap.contains(timelineItemId)) {
+        const ModelNode node = m_modelIdMap[timelineItemId];
+        TimelineItem item(node.simplifiedTypeName(),timelineItemId,getNodeIconUrl(node));
+        m_itemIdMap.insert(timelineItemId,item);
+        m_timelineModel->addItem(item);
+    }
+    else
+        qDebug() << "Item [" << timelineItemId << "] could not be added as it does not exist.";
+}
+
+void TimelineQmlBackend::addTimelineItemProperty(QString itemId, QString propertyName) {
+    if(m_itemIdMap.contains(itemId)) {
+        TimelineItem *item = m_timelineModel->getItemById(itemId);
+        item->propertyMap().insert(propertyName,QList<QObject*>());
+        m_itemIdMap.insert(itemId,*item);
+    }
+    else
+        qDebug() << "Property [" << propertyName << "] could not be added to Item [" << itemId << "] because item does not exist.";
+}
+
+void TimelineQmlBackend::addKeyframe(QString itemId, QString propertyName, int time) {
+    qDebug() << "[backend] addKeyframe(" << itemId << ", " << propertyName << ", " << time << ")";
+    if(m_itemIdMap.contains(itemId)) {
+        TimelineItem *item = m_timelineModel->getItemById(itemId);
+        if(!item->propertyMap().contains(propertyName))
+            addTimelineItemProperty(itemId,propertyName);
+        QVariant startValue = extractValue(m_modelIdMap[itemId],item,propertyName,time);
+        PropertyKeyframePair *keyframe = new PropertyKeyframePair(propertyName,time,0,startValue,startValue,0);
+        item->addKeyframe(keyframe);
+        m_itemIdMap.insert(itemId,*item);
+        m_timelineModel->updateQmlTimelineItem(itemId);
+        context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
+    }
+    else
+        qDebug() << "Keyframe for Property [" << propertyName << "] could not be added to Item [" << itemId << "] because item does not exist.";
+}
+
 void TimelineQmlBackend::reloadConnections() {
-    qDebug() << "[Backend] reloadConnections()";
+    connect(m_widget->rootObject(), SIGNAL(setCurrentTime(int)), this, SLOT(setCurrentTime(int)));
     connect(m_widget->rootObject(), SIGNAL(setTimeline(QString)), this, SLOT(setTimeline(QString)));
+    connect(m_widget->rootObject(), SIGNAL(addTimelineItem(QString)), this, SLOT(addTimelineItem(QString)));
+    connect(m_widget->rootObject(), SIGNAL(addTimelineItemProperty(QString,QString)), this, SLOT(addTimelineItemProperty(QString,QString)));
+    connect(m_widget->rootObject(), SIGNAL(addKeyframe(QString,QString,int)), this, SLOT(addKeyframe(QString,QString,int)));
 }
 
 void TimelineQmlBackend::constructTimeline(QString timelineId) {
@@ -216,21 +268,8 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
         }
     }
 
-    if (startValue.isNull()) {
-        if(item->propertyMap().contains(propertyName))
-            startValue = extractValueAtTime(item->propertyMap()[propertyName],startTime);
-        else {
-            AbstractProperty modelProp = modelNode.property(propertyName.toLatin1());
-            if (modelProp.isValid()) {
-                if (modelProp.isBindingProperty()) {
-                    startValue = modelProp.toBindingProperty().expression();
-                }
-                else if (modelProp.isVariantProperty()) {
-                    startValue = modelProp.toVariantProperty().value();
-                }
-            }
-        }
-    }
+    if (startValue.isNull())
+        startValue = extractValue(modelNode,item,propertyName,startTime);
 
     qDebug() << "Keyframe built: [" << propertyName << " : " << startTime << " : " << startValue << "]";
 
@@ -261,6 +300,23 @@ QString TimelineQmlBackend::getNodeIconUrl(ModelNode modelNode) {
             return QStringLiteral("image://qmldesigner_itemlibrary/");
     }
     return QStringLiteral("image://qmldesigner_itemlibrary/");
+}
+
+QVariant TimelineQmlBackend::extractValue(ModelNode modelNode, TimelineItem *item, QString propertyName, int startTime) const {
+    if(item->propertyMap().contains(propertyName))
+        return extractValueAtTime(item->propertyMap()[propertyName],startTime);
+    else {
+        AbstractProperty modelProp = modelNode.property(propertyName.toLatin1());
+        if (modelProp.isValid()) {
+            if (modelProp.isBindingProperty()) {
+                return modelProp.toBindingProperty().expression();
+            }
+            else if (modelProp.isVariantProperty()) {
+                return modelProp.toVariantProperty().value();
+            }
+        }
+    }
+    return "";
 }
 
 QVariant TimelineQmlBackend::extractValueAtTime(QList<QObject*> keyframes, int startTime) const {

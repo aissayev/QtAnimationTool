@@ -30,8 +30,18 @@ namespace QmlDesigner {
     return m_startTime;
   }
 
+  void PropertyKeyframePair::setStartTime(int startTime) {
+      m_startTime = startTime;
+      emit startTimeChanged();
+  }
+
   int PropertyKeyframePair::duration() const {
     return m_duration;
+  }
+
+  void PropertyKeyframePair::setDuration(int duration) {
+      m_duration = duration;
+      emit durationChanged();
   }
 
   QVariant PropertyKeyframePair::endValue() const {
@@ -126,6 +136,25 @@ namespace QmlDesigner {
   int TimelineModel::rowCount(const QModelIndex & parent) const {
     Q_UNUSED(parent);
     return m_items.count();
+  }
+
+  TimelineItem *TimelineModel::getItemById(QString itemId) {
+    int i;
+    for(i=0; i<m_items.count(); i++) {
+        if(m_items[i].id() == itemId)
+            return &m_items[i];
+    }
+    return NULL;
+  }
+
+  void TimelineModel::updateQmlTimelineItem(QString itemId) {
+      int i;
+      for(i=0; i<m_items.count(); i++) {
+          if(m_items[i].id() == itemId){
+              emit dataChanged(index(i,0),index(i,0));
+              return;
+          }
+      }
   }
 
   QVariant TimelineModel::data(const QModelIndex &index, int role) const {
