@@ -96,6 +96,14 @@ void TimelineQmlBackend::fetchTimelineIds() {
     }
 }
 
+QStringList TimelineQmlBackend::fetchAvailableItemProperties(QString itemId) {
+    QStringList propertyList = QStringList();
+    if(m_modelIdMap.contains(itemId))
+        foreach(PropertyName property, m_modelIdMap[itemId].metaInfo().propertyNames())
+            propertyList.append(QString::fromLatin1(property.data()));
+    return propertyList;
+}
+
 void TimelineQmlBackend::fillModelIdMap() {
     foreach(ModelNode child, m_rootModelNode.allSubModelNodesAndThisNode()) {
         if(child.hasId())

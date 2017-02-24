@@ -48,6 +48,7 @@ namespace QmlDesigner {
     void constructTimelineForItem(ModelNode itemParallelAnimation);
     void constructTimelineForItemProperty(ModelNode itemSequentialAnimation);
     void fetchTimelineIds();
+    QStringList fetchAvailableItemProperties(QString itemId);
     QVariant extractValue(ModelNode modelNode, TimelineItem *item, QString property, int startTime) const;
     QVariant extractValueAtTime(QList<QObject*> keyframes, int startTime) const;
     void updateAvailableItemList();
