@@ -16,5 +16,7 @@
         <file>record@2x.png</file>
         <file>add-keyframe.png</file>
         <file>add-keyframe@2x.png</file>
+        <file>add-property.png</file>
+        <file>add-property@2x.png</file>
     </qresource>
 </RCC>
