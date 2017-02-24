@@ -294,7 +294,7 @@ QString TimelineQmlBackend::getNodeIconUrl(ModelNode modelNode) {
         QList <ItemLibraryEntry> itemLibraryEntryList = libraryInfo->entriesForType(
                     modelNode.type(), modelNode.majorVersion(), modelNode.minorVersion());
         if (!itemLibraryEntryList.isEmpty()) {
-            return QStringLiteral("image://qmldesigner_itemlibrary/") + itemLibraryEntryList.first().libraryEntryIconPath();
+            return QStringLiteral("image://qmldesigner_itemlibrary/") + itemLibraryEntryList.first().libraryEntryIconPath().replace(".png", "16.png");
         }
         else if (modelNode.metaInfo().isValid())
             return QStringLiteral("image://qmldesigner_itemlibrary/");
