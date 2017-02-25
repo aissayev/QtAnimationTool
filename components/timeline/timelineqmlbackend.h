@@ -56,6 +56,7 @@ namespace QmlDesigner {
     ModelNode createModelNode(QString type);
     void exportTimeline();
     void exportTimelineItems(ModelNode timelineRoot);
+    void exportTimelineItemKeyframes(ModelNode itemAnimationNode, TimelineItem item);
 
     PropertyKeyframePair *constructKeyframe(TimelineItem *item, ModelNode modelNode, ModelNode animationNode, int startTime);
     QList<ModelNode> acceptedModelNodeChildren(const ModelNode &parentNode);
@@ -67,5 +68,6 @@ namespace QmlDesigner {
     void addTimelineItem(QString itemId);
     void addTimelineItemProperty(QString itemId,QString propertyName);
     void addKeyframe(QString itemId, QString propertyName, int time);
+    void playPressed();
   };
 }

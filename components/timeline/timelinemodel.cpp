@@ -44,6 +44,10 @@ namespace QmlDesigner {
       emit durationChanged();
   }
 
+  QVariant PropertyKeyframePair::startValue() const {
+      return m_startValue;
+  }
+
   QVariant PropertyKeyframePair::endValue() const {
       return m_endValue;
   }

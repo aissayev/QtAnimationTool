@@ -120,7 +120,7 @@ void TimelineQmlBackend::setCurrentTime(int time) {
 void TimelineQmlBackend::setTimeline(QString timelineId) {
     qDebug() << "[Backend] setTimeline(" << timelineId << ")";
 
-    this->exportTimeline();
+    //this->exportTimeline();
     this->constructTimeline(timelineId);
 }
 
@@ -138,12 +138,48 @@ void TimelineQmlBackend::exportTimeline() {
     timelineNode.variantProperty("running").setValue(running);
 
     exportTimelineItems(timelineNode);
+
+    if(!m_timelineIdList.contains(timelineNode.id()))
+        m_timelineIdList.append(timelineNode.id());
+    context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(QStringList(m_timelineIdList)));
 }
 
 void TimelineQmlBackend::exportTimelineItems(ModelNode timelineRoot) {
     foreach(TimelineItem item, m_timelineModel->items()) {
         ModelNode itemNode = createModelNode("QtQuick.ParallelAnimation");
-        //timelineRoot.nodeAbstractProperty(m_rootModelNode.metaInfo().defaultPropertyName()).reparentHere(itemNode);
+        timelineRoot.nodeAbstractProperty(timelineRoot.metaInfo().defaultPropertyName()).reparentHere(itemNode);
+        exportTimelineItemKeyframes(itemNode, item);
+    }
+}
+
+void TimelineQmlBackend::exportTimelineItemKeyframes(ModelNode itemAnimationNode, TimelineItem item) {
+    NodeAbstractProperty itemParent = itemAnimationNode.nodeAbstractProperty(itemAnimationNode.metaInfo().defaultPropertyName());
+    foreach(QString property, item.properties()) {
+        ModelNode sequentialAnimation = createModelNode("QtQuick.SequentialAnimation");
+        itemParent.reparentHere(sequentialAnimation);
+
+        int time = 0;
+        QVariant lastValue = m_modelIdMap[item.id()].variantProperty(property.toLatin1()).value();
+        NodeAbstractProperty propertyParent = sequentialAnimation.nodeAbstractProperty(sequentialAnimation.metaInfo().defaultPropertyName());
+        QList<QObject*> keyframes = item.propertyMap()[property];
+        foreach(QObject *object, keyframes) {
+            PropertyKeyframePair *keyframe = (PropertyKeyframePair *)object;
+            if(keyframe->startTime() != time) {
+                ModelNode pauseAnimation = createModelNode("QtQuick.PauseAnimation");
+                propertyParent.reparentHere(pauseAnimation);
+                pauseAnimation.variantProperty("duration").setValue(keyframe->startTime() - time);
+            }
+            ModelNode propertyAnimation = createModelNode("QtQuick.PropertyAnimation");
+            propertyParent.reparentHere(propertyAnimation);
+            propertyAnimation.bindingProperty("target").setExpression(item.id());
+            propertyAnimation.variantProperty("property").setValue(property);
+            propertyAnimation.variantProperty("duration").setValue(keyframe->duration());
+            if(keyframe->startValue() != lastValue)
+                propertyAnimation.variantProperty("from").setValue(keyframe->startValue());
+            propertyAnimation.variantProperty("to").setValue(keyframe->endValue());
+            time = keyframe->startTime() + keyframe->duration();
+            lastValue = keyframe->endValue();
+        }
     }
 }
 
@@ -172,8 +208,8 @@ void TimelineQmlBackend::addTimelineItemProperty(QString itemId, QString propert
         qDebug() << "Property [" << propertyName << "] could not be added to Item [" << itemId << "] because item does not exist.";
 }
 
+// TODO: Have keyframe be inserted into the correct location in list so that keyframes are sorted by start time
 void TimelineQmlBackend::addKeyframe(QString itemId, QString propertyName, int time) {
-    qDebug() << "[backend] addKeyframe(" << itemId << ", " << propertyName << ", " << time << ")";
     if(m_itemIdMap.contains(itemId)) {
         TimelineItem *item = m_timelineModel->getItemById(itemId);
         if(!item->propertyMap().contains(propertyName))
@@ -195,6 +231,8 @@ void TimelineQmlBackend::reloadConnections() {
     connect(m_widget->rootObject(), SIGNAL(addTimelineItem(QString)), this, SLOT(addTimelineItem(QString)));
     connect(m_widget->rootObject(), SIGNAL(addTimelineItemProperty(QString,QString)), this, SLOT(addTimelineItemProperty(QString,QString)));
     connect(m_widget->rootObject(), SIGNAL(addKeyframe(QString,QString,int)), this, SLOT(addKeyframe(QString,QString,int)));
+
+    connect(m_widget->rootObject(), SIGNAL(playPressed()), this, SLOT(playPressed()));
 }
 
 void TimelineQmlBackend::constructTimeline(QString timelineId) {
@@ -385,6 +423,10 @@ QList<ModelNode> TimelineQmlBackend::acceptedModelNodeChildren(const ModelNode &
     }
 
     return children;
+}
+
+void TimelineQmlBackend::playPressed() {
+    this->exportTimeline();
 }
 
 TimelineModel *TimelineQmlBackend::model() {

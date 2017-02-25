@@ -21,6 +21,7 @@ namespace QmlDesigner {
     void setStartTime(int startTime);
     int duration() const ;
     void setDuration(int duration);
+    QVariant startValue() const ;
     QVariant endValue() const ;
 
   private:
