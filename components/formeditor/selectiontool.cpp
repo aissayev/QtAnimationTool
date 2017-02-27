@@ -47,7 +47,7 @@ SelectionTool::SelectionTool(FormEditorView *editorView)
     m_resizeIndicator(editorView->scene()->manipulatorLayerItem()),
     m_anchorIndicator(editorView->scene()->manipulatorLayerItem()),
     m_bindingIndicator(editorView->scene()->manipulatorLayerItem()),
-    m_motionIndicator(editorView->scene()->manipulatorLayerItem()),
+    //m_motionIndicator(editorView->scene()->manipulatorLayerItem()),
     m_contentNotEditableIndicator(editorView->scene()->manipulatorLayerItem())
 {
     m_selectionIndicator.setCursor(Qt::ArrowCursor);
@@ -244,7 +244,7 @@ void SelectionTool::clear()
     m_resizeIndicator.clear();
     m_anchorIndicator.clear();
     m_bindingIndicator.clear();
-    m_motionIndicator.clear();
+    //m_motionIndicator.clear();
     m_contentNotEditableIndicator.clear();
 
     AbstractFormEditorTool::clear();
@@ -256,7 +256,7 @@ void SelectionTool::selectedItemsChanged(const QList<FormEditorItem*> &itemList)
     m_resizeIndicator.setItems(itemList);
     m_anchorIndicator.setItems(itemList);
     m_bindingIndicator.setItems(itemList);
-    m_motionIndicator.setItems(itemList);
+    //m_motionIndicator.setItems(itemList);
 }
 
 void SelectionTool::formEditorItemsChanged(const QList<FormEditorItem*> &itemList)
@@ -267,7 +267,7 @@ void SelectionTool::formEditorItemsChanged(const QList<FormEditorItem*> &itemLis
     m_resizeIndicator.updateItems(selectedItemList);
     m_anchorIndicator.updateItems(selectedItemList);
     m_bindingIndicator.updateItems(selectedItemList);
-    m_motionIndicator.updateItems(selectedItemList);
+    //m_motionIndicator.updateItems(selectedItemList);
     m_contentNotEditableIndicator.updateItems(selectedItemList);
 }
 
