@@ -23,6 +23,8 @@ namespace QmlDesigner {
     TimelineModel *model();
     TimelineWidget *widget();
     QQmlContext *context();
+
+    void exportTimeline();
     bool exporting();
 
     void setupModel();
@@ -56,7 +58,6 @@ namespace QmlDesigner {
     void updateAvailableItemList();
 
     ModelNode createModelNode(QString type);
-    void exportTimeline();
     void exportTimelineItems(ModelNode timelineRoot);
     void exportTimelineItemKeyframes(ModelNode itemAnimationNode, TimelineItem item);
 

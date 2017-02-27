@@ -206,16 +206,18 @@ void TimelineQmlBackend::addTimelineItem(QString timelineItemId) {
 }
 
 void TimelineQmlBackend::addTimelineItemProperty(QString itemId, QString propertyName) {
+    qDebug() << "Adding property [" << propertyName << "] to navigator item [" << itemId << "]";
     if(m_itemIdMap.contains(itemId)) {
         TimelineItem *item = m_timelineModel->getItemById(itemId);
-        item->propertyMap().insert(propertyName,QList<QObject*>());
+        item->addProperty(propertyName);
         m_itemIdMap.insert(itemId,*item);
+        context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
+        m_timelineModel->updateQmlTimelineItem(itemId);
     }
     else
         qDebug() << "Property [" << propertyName << "] could not be added to Item [" << itemId << "] because item does not exist.";
 }
 
-// TODO: Have keyframe be inserted into the correct location in list so that keyframes are sorted by start time
 void TimelineQmlBackend::addKeyframe(QString itemId, QString propertyName, int time) {
     if(m_itemIdMap.contains(itemId)) {
         TimelineItem *item = m_timelineModel->getItemById(itemId);

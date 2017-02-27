@@ -61,6 +61,7 @@ namespace QmlDesigner {
     QList<QObject*> keyframes() const ;
     QVariantList sortedKeyframes() const;
 
+    void addProperty(QString propertyName);
     void addKeyframe(PropertyKeyframePair *keyframe);
 
   private:

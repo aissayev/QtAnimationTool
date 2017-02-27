@@ -116,6 +116,10 @@ namespace QmlDesigner {
     return m_propertyMap;
   }
 
+  void TimelineItem::addProperty(QString propertyName) {
+      m_propertyMap.insert(propertyName,QList<QObject*>());
+  }
+
   void TimelineItem::addKeyframe(PropertyKeyframePair *keyframe) {
     m_keyframes.append(keyframe);
 

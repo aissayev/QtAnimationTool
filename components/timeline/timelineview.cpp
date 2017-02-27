@@ -57,6 +57,7 @@ namespace QmlDesigner {
 
   void TimelineView::modelAboutToBeDetached(Model *model) {
     AbstractView::modelAboutToBeDetached(model);
+    m_backend->exportTimeline();
     m_backend->destroyModel();
     emit signalModelAboutToBeDetached();
   }
