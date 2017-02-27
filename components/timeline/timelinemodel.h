@@ -11,18 +11,26 @@ namespace QmlDesigner {
 
     Q_PROPERTY(int startTime READ startTime WRITE setStartTime NOTIFY startTimeChanged)
     Q_PROPERTY(int duration READ duration WRITE setDuration NOTIFY durationChanged)
+    Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue NOTIFY startValueChanged)
+    Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue NOTIFY endValueChanged)
 
   public:
     explicit PropertyKeyframePair(QObject *parent=0);
     PropertyKeyframePair(const QString &property, const int &startTime, const int &duration, const QVariant &startValue, const QVariant &endValue, QObject *parent=0);
 
     QString propertyName() const;
+    // QProperty startTime
     int startTime() const ;
     void setStartTime(int startTime);
+    // QProperty duration
     int duration() const ;
     void setDuration(int duration);
+    // QProperty startValue
     QVariant startValue() const ;
+    void setStartValue(QVariant startValue);
+    // QProperty endValue
     QVariant endValue() const ;
+    void setEndValue(QVariant endValue);
 
   private:
     QString m_property;
@@ -34,6 +42,8 @@ namespace QmlDesigner {
   signals:
     void startTimeChanged();
     void durationChanged();
+    void startValueChanged();
+    void endValueChanged();
   };
 
   class TimelineItem

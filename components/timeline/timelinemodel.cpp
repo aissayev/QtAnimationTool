@@ -49,8 +49,16 @@ namespace QmlDesigner {
       return m_startValue;
   }
 
+  void PropertyKeyframePair::setStartValue(QVariant startValue) {
+      m_startValue = startValue;
+  }
+
   QVariant PropertyKeyframePair::endValue() const {
       return m_endValue;
+  }
+
+  void PropertyKeyframePair::setEndValue(QVariant endValue) {
+      m_endValue = endValue;
   }
 
   // -----------------------------------------------------------------------------
