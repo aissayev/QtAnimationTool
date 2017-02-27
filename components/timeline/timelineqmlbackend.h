@@ -23,6 +23,7 @@ namespace QmlDesigner {
     TimelineModel *model();
     TimelineWidget *widget();
     QQmlContext *context();
+    bool exporting();
 
     void setupModel();
     void destroyModel();
@@ -41,6 +42,7 @@ namespace QmlDesigner {
     QPointer<TimelineView> m_timelineView;
     ModelNode m_rootModelNode;
 
+    bool m_exporting;
     int m_time;
 
     void fillModelIdMap();

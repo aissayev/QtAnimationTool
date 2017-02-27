@@ -33,6 +33,7 @@ TimelineQmlBackend::TimelineQmlBackend(TimelineView *timelineView)
       m_modelIdMap(),
       m_timelineView(timelineView)
 {
+    m_exporting = false;
     m_time = 0;
 
     if (!m_widget) {
@@ -94,6 +95,7 @@ void TimelineQmlBackend::fetchTimelineIds() {
                 qDebug() << "Timeline root found with no id. Ignored";
         }
     }
+    qDebug() << "Timline ID List length: " << m_timelineIdList.size();
 }
 
 QStringList TimelineQmlBackend::fetchAvailableItemProperties(QString itemId) {
@@ -112,36 +114,41 @@ void TimelineQmlBackend::fillModelIdMap() {
 }
 
 void TimelineQmlBackend::setCurrentTime(int time) {
-    qDebug() << "[backend] setCurrentTime(" << time << ")";
     m_time = time;
     context()->setContextProperty(QLatin1String("currentTime"), m_time);
 }
 
 void TimelineQmlBackend::setTimeline(QString timelineId) {
-    qDebug() << "[Backend] setTimeline(" << timelineId << ")";
-
-    //this->exportTimeline();
+    qDebug() << "Setting Timeline: " << timelineId;
+    m_currentTimeline = timelineId;
     this->constructTimeline(timelineId);
 }
 
 void TimelineQmlBackend::exportTimeline() {
-    bool running = false;
-
-    if(m_modelIdMap.contains(m_currentTimeline)) {
-        running = m_modelIdMap[m_currentTimeline].variantProperty("running").value().toBool();
-        //destroy the model node
-    }
+    m_exporting = true;
 
     ModelNode timelineNode = createModelNode("QtQuick.ParallelAnimation");
     m_rootModelNode.nodeAbstractProperty(m_rootModelNode.metaInfo().defaultPropertyName()).reparentHere(timelineNode);
-    timelineNode.setIdWithRefactoring(m_currentTimeline + "_new"); // will remove new tag after model destruction is implemented
-    timelineNode.variantProperty("running").setValue(running);
-
     exportTimelineItems(timelineNode);
 
-    if(!m_timelineIdList.contains(timelineNode.id()))
-        m_timelineIdList.append(timelineNode.id());
+    QString exportedTimeline = m_currentTimeline;
+
+    bool running = false;
+    if(m_modelIdMap.contains(exportedTimeline)) {
+        running = m_modelIdMap[exportedTimeline].variantProperty("running").value().toBool();
+        m_modelIdMap[exportedTimeline].destroy();
+    }
+
+    timelineNode.setIdWithRefactoring(exportedTimeline);
+    timelineNode.variantProperty("running").setValue(running);
+    m_modelIdMap.insert(exportedTimeline, timelineNode);
+    if(!m_timelineIdList.contains(exportedTimeline))
+        m_timelineIdList.append(exportedTimeline);
+    context()->setContextProperty(QLatin1String("modelTree"), m_timelineModel);
     context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(QStringList(m_timelineIdList)));
+    context()->setContextProperty(QLatin1String("availableItemList"), m_availableItemList);
+    //setTimeline(exportedTimeline);
+    m_exporting = false;
 }
 
 void TimelineQmlBackend::exportTimelineItems(ModelNode timelineRoot) {
@@ -426,6 +433,7 @@ QList<ModelNode> TimelineQmlBackend::acceptedModelNodeChildren(const ModelNode &
 }
 
 void TimelineQmlBackend::playPressed() {
+    qDebug() << "Play press registered";
     this->exportTimeline();
 }
 
@@ -435,6 +443,10 @@ TimelineModel *TimelineQmlBackend::model() {
 
 TimelineWidget *TimelineQmlBackend::widget() {
     return m_widget;
+}
+
+bool TimelineQmlBackend::exporting() {
+    return m_exporting;
 }
 
 QQmlContext *TimelineQmlBackend::context() {

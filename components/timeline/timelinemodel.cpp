@@ -41,6 +41,7 @@ namespace QmlDesigner {
 
   void PropertyKeyframePair::setDuration(int duration) {
       m_duration = duration;
+      qDebug() << "[" << m_property << "] duration changed to " << duration;
       emit durationChanged();
   }
 
@@ -113,7 +114,14 @@ namespace QmlDesigner {
     QString property = keyframe->propertyName();
     if (!m_propertyMap.contains(property))
         m_propertyMap.insert(property,QList<QObject*>());
-    m_propertyMap[property].append(keyframe);
+
+    int i;
+    for(i=0; i<m_propertyMap[property].size(); i++) {
+        PropertyKeyframePair *iKeyframe = (PropertyKeyframePair *)(m_propertyMap[property][i]);
+        if(keyframe->startTime() < iKeyframe->startTime())
+            break;
+    }
+    m_propertyMap[property].insert(i,keyframe);
   }
 
   // -----------------------------------------------------------------------------
