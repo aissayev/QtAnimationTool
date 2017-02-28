@@ -119,9 +119,18 @@ void TimelineQmlBackend::setCurrentTime(int time) {
 }
 
 void TimelineQmlBackend::setTimeline(QString timelineId) {
-    qDebug() << "Setting Timeline: " << timelineId;
     m_currentTimeline = timelineId;
     this->constructTimeline(timelineId);
+
+    if(!m_timelineIdList.contains(timelineId)) {
+        m_timelineIdList.append(timelineId);
+        context()->setContextProperty(QLatin1String("timelineList"), QVariant::fromValue(m_timelineIdList));
+        exportTimeline();
+        destroyModel();
+        setupModel();
+    }
+    updateAvailableItemList();
+    context()->setContextProperty(QLatin1String("availableItemList"), m_availableItemList);
 }
 
 void TimelineQmlBackend::exportTimeline() {
@@ -206,7 +215,6 @@ void TimelineQmlBackend::addTimelineItem(QString timelineItemId) {
 }
 
 void TimelineQmlBackend::addTimelineItemProperty(QString itemId, QString propertyName) {
-    qDebug() << "Adding property [" << propertyName << "] to navigator item [" << itemId << "]";
     if(m_itemIdMap.contains(itemId)) {
         TimelineItem *item = m_timelineModel->getItemById(itemId);
         item->addProperty(propertyName);
@@ -258,7 +266,6 @@ void TimelineQmlBackend::constructTimeline(QString timelineId) {
     foreach(TimelineItem item, m_itemIdMap.values())
         m_timelineModel->addItem(item);
     updateAvailableItemList();
-    qDebug() << "[backend-126] Available items: " << m_availableItemList.size();
 }
 
 void TimelineQmlBackend::constructTimelineForItem(ModelNode itemParallelAnimation) {
@@ -351,8 +358,6 @@ PropertyKeyframePair *TimelineQmlBackend::constructKeyframe(TimelineItem *item, 
     if (startValue.isNull())
         startValue = extractValue(modelNode,item,propertyName,startTime);
 
-    qDebug() << "Keyframe built: [" << propertyName << " : " << startTime << " : " << startValue << "]";
-
     return new PropertyKeyframePair(propertyName,startTime,duration,startValue,endValue,0);
 }
 
@@ -435,7 +440,6 @@ QList<ModelNode> TimelineQmlBackend::acceptedModelNodeChildren(const ModelNode &
 }
 
 void TimelineQmlBackend::playPressed() {
-    qDebug() << "Play press registered";
     this->exportTimeline();
 }
 
