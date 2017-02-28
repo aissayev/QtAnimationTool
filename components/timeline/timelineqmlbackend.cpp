@@ -135,7 +135,6 @@ void TimelineQmlBackend::setTimeline(QString timelineId) {
 
 void TimelineQmlBackend::exportTimeline() {
     m_exporting = true;
-
     ModelNode timelineNode = createModelNode("QtQuick.ParallelAnimation");
     m_rootModelNode.nodeAbstractProperty(m_rootModelNode.metaInfo().defaultPropertyName()).reparentHere(timelineNode);
     exportTimelineItems(timelineNode);
@@ -199,6 +198,11 @@ void TimelineQmlBackend::exportTimelineItemKeyframes(ModelNode itemAnimationNode
 }
 
 ModelNode TimelineQmlBackend::createModelNode(QString type) {
+    qDebug() << "Create Model Node [1]";
+    if(m_timelineView != NULL)
+        qDebug() << "Create Model Node [2a]";
+    else
+        qDebug() << "Create Model Node [2b]";
     return m_timelineView->createModelNode(type.toLatin1(),m_rootModelNode.majorVersion(),m_rootModelNode.minorVersion());
 }
 
