@@ -173,7 +173,6 @@ void TimelineQmlBackend::exportTimelineItemKeyframes(ModelNode itemAnimationNode
     foreach(QString property, item.properties()) {
         ModelNode sequentialAnimation = createModelNode("QtQuick.SequentialAnimation");
         itemParent.reparentHere(sequentialAnimation);
-
         int time = 0;
         QVariant lastValue = m_modelIdMap[item.id()].variantProperty(property.toLatin1()).value();
         NodeAbstractProperty propertyParent = sequentialAnimation.nodeAbstractProperty(sequentialAnimation.metaInfo().defaultPropertyName());
