@@ -41,7 +41,6 @@ namespace QmlDesigner {
 
   void PropertyKeyframePair::setDuration(int duration) {
       m_duration = duration;
-      qDebug() << "[" << m_property << "] duration changed to " << duration;
       emit durationChanged();
   }
 
@@ -100,7 +99,6 @@ namespace QmlDesigner {
       foreach(QString property, m_propertyMap.uniqueKeys()) {
           list.append(QVariant::fromValue(m_propertyMap[property]));
       }
-      qDebug() << list.length();
       return list;
   }
 

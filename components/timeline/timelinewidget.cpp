@@ -79,7 +79,6 @@ QString TimelineWidget::qmlSourcesPath() {
 void TimelineWidget::reloadQmlSource()
 {
     QString timelineQmlFilePath = qmlSourcesPath() + QStringLiteral("/QtQuick/timeline.qml");
-    qDebug() << timelineQmlFilePath;
     QTC_ASSERT(QFileInfo::exists(timelineQmlFilePath), return);
     engine()->clearComponentCache();
     setSource(QUrl::fromLocalFile(timelineQmlFilePath));
