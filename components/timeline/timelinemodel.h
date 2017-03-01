@@ -11,7 +11,7 @@ namespace QmlDesigner {
 
     Q_PROPERTY(int startTime READ startTime WRITE setStartTime NOTIFY startTimeChanged)
     Q_PROPERTY(int duration READ duration WRITE setDuration NOTIFY durationChanged)
-    Q_PROPERTY(QString property READ propertyName)
+    Q_PROPERTY(QString property READ propertyName NOTIFY propertyNameChanged)
     Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue NOTIFY startValueChanged)
     Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue NOTIFY endValueChanged)
 
@@ -45,6 +45,7 @@ namespace QmlDesigner {
     void durationChanged();
     void startValueChanged();
     void endValueChanged();
+    void propertyNameChanged();
   };
 
   class TimelineItem
